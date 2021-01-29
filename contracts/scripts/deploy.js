@@ -17,6 +17,11 @@ if (fs.existsSync(addressesDataFile)) {
     } catch (e) {}
 }
 
+const requestId = 123456789;
+const threshold = 15 * 60; // 15 min
+const tipIncrement = ethers.BigNumber.from(10).pow(16); // 0.01 ETH
+
+
 async function main() {
     // Hardhat always runs the compile task when running scripts with its command
     // line interface.
@@ -31,19 +36,24 @@ async function main() {
     const balance_before = await deployer.getBalance();
     console.log('Deployer address', await deployer.getAddress(), 'balance', getBalanceAsNumber(balance_before, 18, 4));
 
-    // We get the contract to deploy
-    const { tellor, subscriptionChecker } = await deployContracts();
-    console.log("tellor deployed at:", tellor.address);
-    if (!addressesData['tellor']) {
-        addressesData['tellor'] = {};
-    }
-    console.log("subscriptionChecker deployed at:", subscriptionChecker.address);
-    if (!addressesData['subscriptionChecker']) {
-        addressesData['subscriptionChecker'] = {};
-    }
-    addressesData['subscriptionChecker'][hre.network.config.chainId ? hre.network.config.chainId : hre.network.name] = subscriptionChecker.address;
+    const networkId = hre.network.config.chainId ? hre.network.config.chainId : hre.network.name;
 
-    fs.writeFileSync(addressesDataFile, JSON.stringify(addressesData));
+    const addContractAddress = (contract, address) => {
+        console.log(contract, "deployed at:", address);
+        if (!addressesData[contract]) {
+            addressesData[contract] = {};
+        }
+        addressesData[contract][networkId] = address;
+    }
+
+    // We get the contract to deploy
+    const { tellor, subscriptionChecker, gameMaster, aToken } = await deployContracts({ subscriptionChecker: [requestId, threshold, tipIncrement] });
+    addContractAddress('aToken', aToken.address);
+    addContractAddress('tellor', tellor.address);
+    addContractAddress('subscriptionChecker', subscriptionChecker.address);
+    addContractAddress('gameMaster', gameMaster.address);
+
+    fs.writeFileSync(addressesDataFile, JSON.stringify(addressesData, null, 4));
 
     const balance_after = await deployer.getBalance();
     console.log('Paid fees', getBalanceAsNumber(balance_before.sub(balance_after), 18, 4), 'new balance', getBalanceAsNumber(balance_after, 18, 4));

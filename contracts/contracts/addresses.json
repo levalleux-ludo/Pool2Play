@@ -1,1 +1,18 @@
-{"subscriptionChecker":{"31337":"0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"},"tellor":{}}
+{
+    "aToken": {
+        "1337": "0x50C48E1577acDd4a96d18D606D57698C8fD0FE6F",
+        "31337": "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+    },
+    "tellor": {
+        "1337": "0xb4Fb9798de10A6F8048D41C51150efbf2a223CD4",
+        "31337": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"
+    },
+    "subscriptionChecker": {
+        "1337": "0x200E5295fEC37B4410E6688a94de22C9d4C6DDbb",
+        "31337": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0"
+    },
+    "gameMaster": {
+        "1337": "0x43233343AF88d384A814852Fa6A7616992c5737c",
+        "31337": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9"
+    }
+}
