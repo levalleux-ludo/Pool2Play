@@ -3,9 +3,12 @@ const { ethers } = require("hardhat");
 const { deployContracts } = require("../scripts/utils");
 
 let tellor, subscriptionChecker;
-let requestId;
 let deployer, account1, account2;
 let deployerAddr, account1Addr, account2Addr;
+
+const requestId = 123456789;
+const threshold = 15 * 60; // 15 min
+const tipIncrement = ethers.BigNumber.from(10).pow(16); // 0.01 ETH
 
 describe("subscriptionChecker", function() {
     before('', async() => {
@@ -13,10 +16,9 @@ describe("subscriptionChecker", function() {
         deployerAddr = await deployer.getAddress();
         account1Addr = await account1.getAddress();
         account2Addr = await account2.getAddress();
-        const contracts = await deployContracts();
+        const contracts = await deployContracts({ subscriptionChecker: [requestId, threshold, tipIncrement] });
         tellor = contracts.tellor;
         subscriptionChecker = contracts.subscriptionChecker;
-        requestId = 12;
     })
     it("Current value shall not be available", async function() {
         const ret = await subscriptionChecker.getCurrentValue(requestId);

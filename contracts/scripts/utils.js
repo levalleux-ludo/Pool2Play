@@ -20,14 +20,21 @@ async function deployContracts(args = undefined) {
     await tellor.deployed();
 
     const SubscriptionChecker = await hre.ethers.getContractFactory("SubscriptionChecker");
-    // params = [];
-    // console.log(args);
-    // if (args && args.subscriptionChecker) {
-    //     params = args.subscriptionChecker;
-    // }
-    const subscriptionChecker = await SubscriptionChecker.deploy(tellor.address);
+    params = [];
+    if (args && args.subscriptionChecker) {
+        params = args.subscriptionChecker;
+    }
+    const subscriptionChecker = await SubscriptionChecker.deploy(tellor.address, ...params);
     await subscriptionChecker.deployed();
-    return { tellor, subscriptionChecker };
+    await tellor.faucet(subscriptionChecker.address);
+
+    const GameMaster = await hre.ethers.getContractFactory("GameMaster");
+    const gameMaster = await GameMaster.deploy(subscriptionChecker.address);
+    await gameMaster.deployed();
+
+    return { tellor, subscriptionChecker, gameMaster };
+
+
 }
 
 
