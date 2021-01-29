@@ -60,5 +60,26 @@ describe("gameMaster", function() {
             .to.not.emit(tellor, 'TipAdded');
         expect(await gameMaster.playerStatus(account1Addr)).to.eq(PlayerStatus.Unregistered);
     });
+    it('Player 2 registering and pending', async() => {
+        const balanceBefore = await tellor.balanceOf(subscriptionChecker.address);
+        expect(await gameMaster.connect(account2).register())
+            .to.emit(tellor, 'TipAdded').withArgs(subscriptionChecker.address, requestId, tipIncrement)
+            .to.emit(gameMaster, 'PlayerStatusChanged').withArgs(account2Addr, PlayerStatus.Pending);
+        expect(await gameMaster.playerStatus(account2Addr)).to.eq(PlayerStatus.Pending);
+        const balanceAfter = await tellor.balanceOf(subscriptionChecker.address);
+        expect(balanceBefore.sub(balanceAfter).eq(tipIncrement)).to.be.true;
+    });
+    it('Oracle set positive value for Player 2', async() => {
+        const blockNumber = await ethers.provider.getBlockNumber();
+        const block = await ethers.provider.getBlock(blockNumber);
+        expect(await tellor.submitValue(requestId, 1))
+            .to.emit(tellor, 'NewValue');
+    });
+    it('Player 2 call register a 2nd time and is being registered', async() => {
+        expect(await gameMaster.connect(account2).register())
+            .to.emit(gameMaster, 'PlayerStatusChanged').withArgs(account2Addr, PlayerStatus.Registered)
+            .to.not.emit(tellor, 'TipAdded');
+        expect(await gameMaster.playerStatus(account2Addr)).to.eq(PlayerStatus.Registered);
+    });
 
 });

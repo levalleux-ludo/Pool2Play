@@ -2,10 +2,10 @@
 pragma solidity ^0.7.0;
 
 import "hardhat/console.sol";
-import "usingtellor/contracts/UsingTellor.sol";
+import "./usingtellor/UsingTellor.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "./ISubscriptionChecker.sol";
-import "usingtellor/Interface/ITellor.sol";
+import "./Interface/ITellor.sol";
 
 contract SubscriptionChecker is UsingTellor, ISubscriptionChecker {
   using SafeMath for uint256;
