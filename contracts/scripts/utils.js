@@ -1,5 +1,6 @@
 const { deployContract } = require("ethereum-waffle");
 const { ethers } = require("hardhat");
+const { getContractFactory } = require("hardhat/types");
 
 function revertMessage(error) {
     return 'VM Exception while processing transaction: revert ' + error;
@@ -14,15 +15,19 @@ function getBalanceAsNumber(bn, decimals, accuracy) {
 }
 
 async function deployContracts(args = undefined) {
-    const Greeter = await hre.ethers.getContractFactory("Greeter");
-    params = [];
-    console.log(args);
-    if (args && args.Greeter) {
-        params = args.Greeter;
-    }
-    const greeter = await Greeter.deploy(...params);
-    await greeter.deployed();
-    return [greeter];
+    const TellorPlayground = await hre.ethers.getContractFactory("TellorPlayground");
+    const tellor = await TellorPlayground.deploy();
+    await tellor.deployed();
+
+    const SubscriptionChecker = await hre.ethers.getContractFactory("SubscriptionChecker");
+    // params = [];
+    // console.log(args);
+    // if (args && args.subscriptionChecker) {
+    //     params = args.subscriptionChecker;
+    // }
+    const subscriptionChecker = await SubscriptionChecker.deploy(tellor.address);
+    await subscriptionChecker.deployed();
+    return { tellor, subscriptionChecker };
 }
 
 

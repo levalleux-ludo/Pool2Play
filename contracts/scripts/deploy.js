@@ -11,8 +11,10 @@ const { getBalanceAsNumber, deployContracts } = require("./utils");
 const addressesDataFile = './contracts/addresses.json';
 let addressesData = {};
 if (fs.existsSync(addressesDataFile)) {
-    addressesData = JSON.parse(fs.readFileSync(addressesDataFile));
-    console.log('Existing addresses file', JSON.stringify(addressesData));
+    try {
+        addressesData = JSON.parse(fs.readFileSync(addressesDataFile));
+        console.log('Existing addresses file', JSON.stringify(addressesData));
+    } catch (e) {}
 }
 
 async function main() {
@@ -30,12 +32,16 @@ async function main() {
     console.log('Deployer address', await deployer.getAddress(), 'balance', getBalanceAsNumber(balance_before, 18, 4));
 
     // We get the contract to deploy
-    const [greeter] = await deployContracts({ 'Greeter': ["Hello, world!", 12] });
-    console.log("Greeter deployed to:", greeter.address);
-    if (!addressesData['greeter']) {
-        addressesData['greeter'] = {};
+    const { tellor, subscriptionChecker } = await deployContracts();
+    console.log("tellor deployed at:", tellor.address);
+    if (!addressesData['tellor']) {
+        addressesData['tellor'] = {};
     }
-    addressesData['greeter'][hre.network.config.chainId ? hre.network.config.chainId : hre.network.name] = greeter.address;
+    console.log("subscriptionChecker deployed at:", subscriptionChecker.address);
+    if (!addressesData['subscriptionChecker']) {
+        addressesData['subscriptionChecker'] = {};
+    }
+    addressesData['subscriptionChecker'][hre.network.config.chainId ? hre.network.config.chainId : hre.network.name] = subscriptionChecker.address;
 
     fs.writeFileSync(addressesDataFile, JSON.stringify(addressesData));
 
