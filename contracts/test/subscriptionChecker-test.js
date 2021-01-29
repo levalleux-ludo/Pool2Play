@@ -1,8 +1,8 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
-const { deployContracts } = require("../scripts/utils");
+const { deployContracts, computeParamsHash } = require("../scripts/utils");
 
-let tellor, subscriptionChecker;
+let tellor, subscriptionChecker, aToken;
 let deployer, account1, account2;
 let deployerAddr, account1Addr, account2Addr;
 
@@ -19,9 +19,13 @@ describe("subscriptionChecker", function() {
         const contracts = await deployContracts({ subscriptionChecker: [requestId, threshold, tipIncrement] });
         tellor = contracts.tellor;
         subscriptionChecker = contracts.subscriptionChecker;
+        aToken = contracts.aToken;
     })
     it("Current value shall not be available", async function() {
-        const ret = await subscriptionChecker.getCurrentValue(requestId);
+        const params = await ethers.utils.defaultAbiCoder.encode([{ type: 'address' }, { type: 'address' }], [aToken.address, account1Addr]);
+        await tellor.addParams(requestId, params);
+        const paramsHash = computeParamsHash(aToken.address, account1Addr);
+        const ret = await subscriptionChecker.getCurrentValue(requestId, paramsHash);
         expect(ret.length).to.equal(3);
         expect(ret[0]).to.be.false;
     });
@@ -32,13 +36,14 @@ describe("subscriptionChecker", function() {
         await tellor.faucet(account1Addr);
         expect((await tellor.balanceOf(account1Addr)).gt(0)).to.be.true;
     });
-    it('Current value shall not be available', async() => {
+    it('Current value shall be available', async() => {
         const val = 100;
-        await tellor.submitValue(requestId, val);
+        const paramsHash = computeParamsHash(aToken.address, account1Addr);
+        await tellor.submitValue(requestId, paramsHash, val);
         const blockNumber = await ethers.provider.getBlockNumber();
         const block = await ethers.provider.getBlock(blockNumber);
         // console.log('block', block);
-        const ret = await subscriptionChecker.getCurrentValue(requestId);
+        const ret = await subscriptionChecker.getCurrentValue(requestId, paramsHash);
         expect(ret.length).to.equal(3);
         expect(ret[0]).to.be.true;
         expect(ret[1].eq(val)).to.be.true;

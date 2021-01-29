@@ -42,7 +42,7 @@ interface ITellor {
      * @param _tip amount the requester is willing to pay to be get on queue. Miners
      * mine the onDeckQueryHash, or the api with the highest payout pool
      */
-    function addTip(uint256 _requestId, uint256 _tip) external;
+    function addTip(uint256 _requestId, bytes32 _paramsHash, uint256 _tip) external;
 
     /**
      * @dev This is called by the miner when they submit the PoW solution (proof of work and value)
@@ -381,7 +381,7 @@ interface ITellor {
      * @param _requestId the requestId to look up
      * @return uint count of the number of values received for the requestId
      */
-    function getNewValueCountbyRequestId(uint256 _requestId)
+    function getNewValueCountbyRequestId(uint256 _requestId, bytes32 _paramsHash)
         external
         view
         returns (uint256);
@@ -486,7 +486,7 @@ interface ITellor {
      * @param _index is the value index to look up
      * @return uint timestamp
      */
-    function getTimestampbyRequestIDandIndex(uint256 _requestID, uint256 _index)
+    function getTimestampbyRequestIDandIndex(uint256 _requestID, bytes32 _paramsHash, uint256 _index)
         external
         view
         returns (uint256);
@@ -521,7 +521,7 @@ interface ITellor {
      * @param _timestamp is the timestamp to look up miners for
      * @return bool true if requestId/timestamp is under dispute
      */
-    function isInDispute(uint256 _requestId, uint256 _timestamp)
+    function isInDispute(uint256 _requestId, bytes32 _paramsHash, uint256 _timestamp)
         external
         view
         returns (bool);
@@ -532,7 +532,7 @@ interface ITellor {
      * @param _timestamp to retreive data/value from
      * @return value for timestamp submitted
      */
-    function retrieveData(uint256 _requestId, uint256 _timestamp)
+    function retrieveData(uint256 _requestId, bytes32 _paramsHash, uint256 _timestamp)
         external
         view
         returns (uint256);
@@ -542,4 +542,6 @@ interface ITellor {
      * @return uint total supply
      */
     function totalSupply() external view returns (uint256);
+
+    function addParams(uint256 _requestId, bytes calldata _data) external returns (bytes32);
 }

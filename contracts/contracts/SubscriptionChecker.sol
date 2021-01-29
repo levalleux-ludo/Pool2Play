@@ -14,19 +14,23 @@ contract SubscriptionChecker is UsingTellor, ISubscriptionChecker {
   uint256 public tipIncrement;
   uint256 public threshold;
   address payable telloraddress;
+  address public subscribedToken;
 
-  constructor(address payable _telloraddress, uint256 _requestId, uint256 _threshold, uint256 _tipIncrement) UsingTellor(_telloraddress) {
+  constructor(address payable _telloraddress, address _subscribedToken, uint256 _requestId, uint256 _threshold, uint256 _tipIncrement) UsingTellor(_telloraddress) {
     telloraddress = _telloraddress;
     requestId = _requestId;
     threshold = _threshold;
     tipIncrement = _tipIncrement;
+    subscribedToken = _subscribedToken;
   }
 
   function check(address account, bool tip) external override returns (bool didGet, bool hasSubscribed) {
     uint _timestamp;
     uint _subscriptionBalance;
+    bytes32 paramsHash = ITellor(telloraddress).addParams(requestId, abi.encode(subscribedToken, account));
+    // TODO bytes32 paramsHash = keccak256(abi.encode(subscribedToken, abi.encode('balanceOf)...));
 
-    (didGet, _subscriptionBalance, _timestamp) = getCurrentValue(requestId);
+    (didGet, _subscriptionBalance, _timestamp) = getCurrentValue(requestId, paramsHash);
     didGet = (_timestamp != 0); // Bug in UsingTellor ??
     console.log("SubscriptionChecker:check didGet", didGet);
     console.log("SubscriptionChecker:check _subscriptionBalance", _subscriptionBalance);
@@ -37,7 +41,7 @@ contract SubscriptionChecker is UsingTellor, ISubscriptionChecker {
     if (didGet) {
       hasSubscribed = (_subscriptionBalance > 0);
     } else if (tip) {
-      ITellor(telloraddress).addTip(requestId, tipIncrement);
+      ITellor(telloraddress).addTip(requestId, paramsHash, tipIncrement);
     }
   }
 

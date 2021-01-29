@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.7.0;
 
+import "hardhat/console.sol";
+
 library SafeMath {
     function add(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a + b;
@@ -80,13 +82,15 @@ contract TellorPlayground {
     event TipAdded(
         address indexed _sender,
         uint256 indexed _requestId,
+        bytes32 _paramsHash,
         uint256 _tip
     );
-    event NewValue(uint256 _requestId, uint256 _time, uint256 _value);
+    event NewValue(uint256 _requestId, bytes32 _paramsHash, uint256 _time, uint256 _value);
 
-    mapping(uint256 => mapping(uint256 => uint256)) public values; //requestId -> timestamp -> value
-    mapping(uint256 => mapping(uint256 => bool)) public isDisputed; //requestId -> timestamp -> value
-    mapping(uint256 => uint256[]) public timestamps;
+    mapping(uint256 => mapping(bytes32 => mapping(uint256 => uint256))) public values; //requestId -> paramsHash -> timestamp -> value
+    mapping(uint256 => mapping(bytes32 => mapping(uint256 => bool))) public isDisputed; //requestId -> paramsHash -> timestamp -> value
+    mapping(uint256 => mapping(bytes32 => uint256[])) public timestamps;
+    mapping(bytes32 => bytes) public reqParams;
     mapping(address => uint256) public balances;
     mapping(address => uint256) private _balances;
     mapping(address => mapping(address => uint256)) private _allowances;
@@ -327,10 +331,10 @@ contract TellorPlayground {
      * @param _requestId The tellorId to associate the value to
      * @param _value the value for the requestId
      */
-    function submitValue(uint256 _requestId, uint256 _value) external {
-        values[_requestId][block.timestamp] = _value;
-        timestamps[_requestId].push(block.timestamp);
-        emit NewValue(_requestId, block.timestamp, _value);
+    function submitValue(uint256 _requestId, bytes32 _paramsHash, uint256 _value) external {
+        values[_requestId][_paramsHash][block.timestamp] = _value;
+        timestamps[_requestId][_paramsHash].push(block.timestamp);
+        emit NewValue(_requestId, _paramsHash, block.timestamp, _value);
     }
 
     /**
@@ -338,9 +342,9 @@ contract TellorPlayground {
      * @param _requestId The tellorId to be disputed
      * @param _timestamp the timestamp that indentifies for the value
      */
-    function disputeValue(uint256 _requestId, uint256 _timestamp) external {
-        values[_requestId][_timestamp] = 0;
-        isDisputed[_requestId][_timestamp] = true;
+    function disputeValue(uint256 _requestId, bytes32 _paramsHash, uint256 _timestamp) external {
+        values[_requestId][_paramsHash][_timestamp] = 0;
+        isDisputed[_requestId][_paramsHash][_timestamp] = true;
     }
 
     /**
@@ -349,12 +353,12 @@ contract TellorPlayground {
      * @param _timestamp to retreive data/value from
      * @return uint value for requestId/timestamp submitted
      */
-    function retrieveData(uint256 _requestId, uint256 _timestamp)
+    function retrieveData(uint256 _requestId, bytes32 _paramsHash, uint256 _timestamp)
         external
         view
         returns (uint256)
     {
-        return values[_requestId][_timestamp];
+        return values[_requestId][_paramsHash][_timestamp];
     }
 
     /**
@@ -363,12 +367,12 @@ contract TellorPlayground {
      * @param _timestamp is the timestamp to look up miners for
      * @return bool true if requestId/timestamp is under dispute
      */
-    function isInDispute(uint256 _requestId, uint256 _timestamp)
+    function isInDispute(uint256 _requestId, bytes32 _paramsHash, uint256 _timestamp)
         external
         view
         returns (bool)
     {
-        return isDisputed[_requestId][_timestamp];
+        return isDisputed[_requestId][_paramsHash][_timestamp];
     }
 
     /**
@@ -376,12 +380,12 @@ contract TellorPlayground {
      * @param _requestId the requestId to look up
      * @return uint count of the number of values received for the requestId
      */
-    function getNewValueCountbyRequestId(uint256 _requestId)
+    function getNewValueCountbyRequestId(uint256 _requestId, bytes32 _paramsHash)
         external
         view
         returns (uint256)
     {
-        return timestamps[_requestId].length;
+        return timestamps[_requestId][_paramsHash].length;
     }
 
     /**
@@ -390,14 +394,14 @@ contract TellorPlayground {
      * @param index is the value index to look up
      * @return uint timestamp
      */
-    function getTimestampbyRequestIDandIndex(uint256 _requestId, uint256 index)
+    function getTimestampbyRequestIDandIndex(uint256 _requestId, bytes32 _paramsHash, uint256 index)
         external
         view
         returns (uint256)
     {
-        uint256 len = timestamps[_requestId].length;
+        uint256 len = timestamps[_requestId][_paramsHash].length;
         if (len == 0 || len <= index) return 0;
-        return timestamps[_requestId][index];
+        return timestamps[_requestId][_paramsHash][index];
     }
 
     /**
@@ -405,8 +409,27 @@ contract TellorPlayground {
      * @param _requestId is the requestId to look up
      * @param _amount is the amount of tips
      */
-    function addTip(uint256 _requestId, uint256 _amount) external {
+    function addTip(uint256 _requestId, bytes32 _paramsHash, uint256 _amount) external {
         _transfer(msg.sender, address(this), _amount);
-        emit TipAdded(msg.sender, _requestId, _amount);
+        emit TipAdded(msg.sender, _requestId, _paramsHash, _amount);
     }
+
+    function addParams(uint256 _requestId, bytes calldata _data) external returns (bytes32) {
+        console.logBytes(_data);
+        bytes32 paramsHash = keccak256(_data);
+        console.logBytes32(paramsHash);
+        reqParams[paramsHash] = _data;
+        return paramsHash;
+    }
+
+    function getParams(bytes32 _paramsHash) external view returns (bytes memory) {
+        // bytes storage params = reqParams[_paramsHash];
+        // bytes memory retVal = new bytes(params.length);
+        // for (uint i = 0; i < params.length; i++) {
+        //     retVal[i] = params[i];
+        // }
+        // return retVal;
+        return reqParams[_paramsHash];
+    }
+
 }

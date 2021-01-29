@@ -26,12 +26,12 @@ contract UsingTellor {
      * @param _timestamp to retreive data/value from
      * @return uint value for requestId/timestamp submitted
      */
-    function retrieveData(uint256 _requestId, uint256 _timestamp)
+    function retrieveData(uint256 _requestId, bytes32 _paramsHash, uint256 _timestamp)
         public
         view
         returns (uint256)
     {
-        return tellor.retrieveData(_requestId, _timestamp);
+        return tellor.retrieveData(_requestId, _paramsHash, _timestamp);
     }
 
     /**
@@ -40,12 +40,12 @@ contract UsingTellor {
      * @param _timestamp is the timestamp to look up miners for
      * @return bool true if requestId/timestamp is under dispute
      */
-    function isInDispute(uint256 _requestId, uint256 _timestamp)
+    function isInDispute(uint256 _requestId, bytes32 _paramsHash, uint256 _timestamp)
         public
         view
         returns (bool)
     {
-        return tellor.isInDispute(_requestId, _timestamp);
+        return tellor.isInDispute(_requestId, _paramsHash, _timestamp);
     }
 
     /**
@@ -53,12 +53,12 @@ contract UsingTellor {
      * @param _requestId the requestId to look up
      * @return uint count of the number of values received for the requestId
      */
-    function getNewValueCountbyRequestId(uint256 _requestId)
+    function getNewValueCountbyRequestId(uint256 _requestId, bytes32 _paramsHash)
         public
         view
         returns (uint256)
     {
-        return tellor.getNewValueCountbyRequestId(_requestId);
+        return tellor.getNewValueCountbyRequestId(_requestId, _paramsHash);
     }
 
     /**
@@ -68,12 +68,12 @@ contract UsingTellor {
      * @return uint timestamp
      */
 
-    function getTimestampbyRequestIDandIndex(uint256 _requestId, uint256 _index)
+    function getTimestampbyRequestIDandIndex(uint256 _requestId, bytes32 _paramsHash, uint256 _index)
         public
         view
         returns (uint256)
     {
-        return tellor.getTimestampbyRequestIDandIndex(_requestId, _index);
+        return tellor.getTimestampbyRequestIDandIndex(_requestId, _paramsHash, _index);
     }
 
     /**
@@ -83,7 +83,7 @@ contract UsingTellor {
      * @return value the value retrieved
      * @return _timestampRetrieved the value's timestamp
      */
-    function getCurrentValue(uint256 _requestId)
+    function getCurrentValue(uint256 _requestId, bytes32 _paramsHash)
         public
         view
         returns (
@@ -92,21 +92,21 @@ contract UsingTellor {
             uint256 _timestampRetrieved
         )
     {
-        uint256 _count = tellor.getNewValueCountbyRequestId(_requestId);
+        uint256 _count = tellor.getNewValueCountbyRequestId(_requestId, _paramsHash);
         uint256 _time =
-            tellor.getTimestampbyRequestIDandIndex(_requestId, _count - 1);
-        uint256 _value = tellor.retrieveData(_requestId, _time);
+            tellor.getTimestampbyRequestIDandIndex(_requestId, _paramsHash, _count - 1);
+        uint256 _value = tellor.retrieveData(_requestId, _paramsHash, _time);
         if (_value > 0) return (true, _value, _time);
         return (false, 0, _time);
     }
 
     // slither-disable-next-line calls-loop
-    function getIndexForDataBefore(uint256 _requestId, uint256 _timestamp)
+    function getIndexForDataBefore(uint256 _requestId, bytes32 _paramsHash, uint256 _timestamp)
         public
         view
         returns (bool found, uint256 index)
     {
-        uint256 _count = tellor.getNewValueCountbyRequestId(_requestId);
+        uint256 _count = tellor.getNewValueCountbyRequestId(_requestId, _paramsHash);
         if (_count > 0) {
             uint256 middle;
             uint256 start = 0;
@@ -114,9 +114,9 @@ contract UsingTellor {
             uint256 _time;
 
             //Checking Boundaries to short-circuit the algorithm
-            _time = tellor.getTimestampbyRequestIDandIndex(_requestId, start);
+            _time = tellor.getTimestampbyRequestIDandIndex(_requestId, _paramsHash, start);
             if (_time >= _timestamp) return (false, 0);
-            _time = tellor.getTimestampbyRequestIDandIndex(_requestId, end);
+            _time = tellor.getTimestampbyRequestIDandIndex(_requestId, _paramsHash, end);
             if (_time < _timestamp) return (true, end);
 
             //Since the value is within our boundaries, do a binary search
@@ -124,6 +124,7 @@ contract UsingTellor {
                 middle = (end - start) / 2 + 1 + start;
                 _time = tellor.getTimestampbyRequestIDandIndex(
                     _requestId,
+                    _paramsHash,
                     middle
                 );
                 if (_time < _timestamp) {
@@ -131,6 +132,7 @@ contract UsingTellor {
                     uint256 _nextTime =
                         tellor.getTimestampbyRequestIDandIndex(
                             _requestId,
+                            _paramsHash,
                             middle + 1
                         );
                     if (_nextTime >= _timestamp) {
@@ -144,6 +146,7 @@ contract UsingTellor {
                     uint256 _prevTime =
                         tellor.getTimestampbyRequestIDandIndex(
                             _requestId,
+                            _paramsHash,
                             middle - 1
                         );
                     if (_prevTime < _timestamp) {
@@ -169,7 +172,7 @@ contract UsingTellor {
      * @return _value the value retrieved
      * @return _timestampRetrieved the value's timestamp
      */
-    function getDataBefore(uint256 _requestId, uint256 _timestamp)
+    function getDataBefore(uint256 _requestId, bytes32 _paramsHash, uint256 _timestamp)
         public
         view
         returns (
@@ -179,11 +182,11 @@ contract UsingTellor {
         )
     {
         (bool _found, uint256 _index) =
-            getIndexForDataBefore(_requestId, _timestamp);
+            getIndexForDataBefore(_requestId, _paramsHash, _timestamp);
         if (!_found) return (false, 0, 0);
         uint256 _time =
-            tellor.getTimestampbyRequestIDandIndex(_requestId, _index);
-        _value = tellor.retrieveData(_requestId, _time);
+            tellor.getTimestampbyRequestIDandIndex(_requestId, _paramsHash, _index);
+        _value = tellor.retrieveData(_requestId, _paramsHash, _time);
         //If value is diputed it'll return zero
         if (_value > 0) return (true, _value, _time);
         return (false, 0, 0);

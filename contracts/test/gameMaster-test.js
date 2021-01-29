@@ -1,8 +1,8 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
-const { deployContracts } = require("../scripts/utils");
+const { deployContracts, computeParamsHash } = require("../scripts/utils");
 
-let tellor, subscriptionChecker, gameMaster;
+let tellor, subscriptionChecker, gameMaster, aToken;
 let deployer, account1, account2;
 let deployerAddr, account1Addr, account2Addr;
 
@@ -26,6 +26,7 @@ describe("gameMaster", function() {
         tellor = contracts.tellor;
         subscriptionChecker = contracts.subscriptionChecker;
         gameMaster = contracts.gameMaster;
+        aToken = contracts.aToken;
     })
     it('Initial balance of SubscriptionChecker is not null', async() => {
         expect((await tellor.balanceOf(subscriptionChecker.address)).gt(0)).to.be.true;
@@ -35,8 +36,9 @@ describe("gameMaster", function() {
     });
     it('Player 1 registering and pending', async() => {
         const balanceBefore = await tellor.balanceOf(subscriptionChecker.address);
+        const paramsHash = await computeParamsHash(aToken.address, account1Addr);
         expect(await gameMaster.connect(account1).register())
-            .to.emit(tellor, 'TipAdded').withArgs(subscriptionChecker.address, requestId, tipIncrement)
+            .to.emit(tellor, 'TipAdded').withArgs(subscriptionChecker.address, requestId, paramsHash, tipIncrement)
             .to.emit(gameMaster, 'PlayerStatusChanged').withArgs(account1Addr, PlayerStatus.Pending);
         expect(await gameMaster.playerStatus(account1Addr)).to.eq(PlayerStatus.Pending);
         const balanceAfter = await tellor.balanceOf(subscriptionChecker.address);
@@ -51,7 +53,8 @@ describe("gameMaster", function() {
     it('Oracle set null value for Player 1', async() => {
         const blockNumber = await ethers.provider.getBlockNumber();
         const block = await ethers.provider.getBlock(blockNumber);
-        expect(await tellor.submitValue(requestId, 0))
+        const paramsHash = await computeParamsHash(aToken.address, account1Addr);
+        expect(await tellor.submitValue(requestId, paramsHash, 0))
             .to.emit(tellor, 'NewValue');
     });
     it('Player 1 call register a 3rd time', async() => {
@@ -62,8 +65,9 @@ describe("gameMaster", function() {
     });
     it('Player 2 registering and pending', async() => {
         const balanceBefore = await tellor.balanceOf(subscriptionChecker.address);
+        const paramsHash = await computeParamsHash(aToken.address, account2Addr);
         expect(await gameMaster.connect(account2).register())
-            .to.emit(tellor, 'TipAdded').withArgs(subscriptionChecker.address, requestId, tipIncrement)
+            .to.emit(tellor, 'TipAdded').withArgs(subscriptionChecker.address, requestId, paramsHash, tipIncrement)
             .to.emit(gameMaster, 'PlayerStatusChanged').withArgs(account2Addr, PlayerStatus.Pending);
         expect(await gameMaster.playerStatus(account2Addr)).to.eq(PlayerStatus.Pending);
         const balanceAfter = await tellor.balanceOf(subscriptionChecker.address);
@@ -72,7 +76,8 @@ describe("gameMaster", function() {
     it('Oracle set positive value for Player 2', async() => {
         const blockNumber = await ethers.provider.getBlockNumber();
         const block = await ethers.provider.getBlock(blockNumber);
-        expect(await tellor.submitValue(requestId, 1))
+        const paramsHash = await computeParamsHash(aToken.address, account2Addr);
+        expect(await tellor.submitValue(requestId, paramsHash, 1))
             .to.emit(tellor, 'NewValue');
     });
     it('Player 2 call register a 2nd time and is being registered', async() => {
