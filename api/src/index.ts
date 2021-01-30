@@ -1,3 +1,4 @@
+import { MinerController } from './api.controllers/miner.controller';
 import { ApiServer } from './server';
 import { getMessage } from './message';
 import { TestController } from './api.controllers/testController';
@@ -9,8 +10,9 @@ const main = async () => {
 
     const rootController = new RootController();
     const testController = new TestController();
+    const minerController = new MinerController();
 
-    const server = new ApiServer([rootController, testController]);
+    const server = new ApiServer([rootController, testController, minerController]);
     server.start();
 }
 
