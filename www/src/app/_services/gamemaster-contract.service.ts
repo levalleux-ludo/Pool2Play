@@ -3,31 +3,40 @@ import { BlockchainService } from './blockchain.service';
 import { Inject, Injectable } from '@angular/core';
 import Web3 from 'web3';
 import { WEB3 } from '../_helpers/tokens';
-import aTokenJSON from '../../../../contracts/artifacts/contracts/AToken.sol/AToken.json';
+import gameMasterJSON from '../../../../contracts/artifacts/contracts/GameMaster.sol/GameMaster.json';
 import addresses from '../../../../contracts/contracts/addresses.json';
 import BigNumber from 'bignumber.js';
 
+export enum ePlayerStatus {
+  Unregistered = 0,
+  Pending = 1,
+  Registered = 2
+}
+
+export const PlayerStatus = Object.keys(ePlayerStatus).map(key => ePlayerStatus[key]).filter(value => typeof value === 'string') as string[];
 
 @Injectable({
   providedIn: 'root'
 })
-export class AtokenContractService {
+export class GameMasterContractService {
   address: string;
   contract: any;
 
   connected = new BehaviorSubject<boolean>(false);
+  myStatus = new BehaviorSubject<number | undefined>(undefined);
 
   constructor(
     @Inject(WEB3) private web3: Web3,
     private blockchainService: BlockchainService
   ) {
+    console.log('PlayerStatus', PlayerStatus);
     this.blockchainService.connectionStatus.subscribe((status) => {
       if (status.connected) {
-        const address = addresses.aToken[status.chainId];
+        const address = addresses.gameMaster[status.chainId];
         if (address) {
           this.connect(address);
         } else {
-          throw new Error('Unable to find address for contract aToken on chain ' + status.chainId);
+          throw new Error('Unable to find address for contract gameMaster on chain ' + status.chainId);
         }
       } else {
         this.disconnect();
@@ -36,9 +45,21 @@ export class AtokenContractService {
   }
 
   async connect(address: string) {
-    this.contract = new this.web3.eth.Contract(aTokenJSON.abi as any, address);
+    this.contract = new this.web3.eth.Contract(gameMasterJSON.abi as any, address);
     this.address = address;
+    this.contract.events.PlayerStatusChanged({}, (error, event) => {
+      if (error) {
+        console.error(error);
+      } else {
+        console.log('Game Master receive event', JSON.stringify(event));
+        if (event.returnValues.player === this.blockchainService.status.account) {
+          this.myStatus.next(event.returnValues.status);
+        }
+      }
+    });
     this.connected.next(true);
+    const status = await this.playerStatus(this.blockchainService.status.account);
+    this.myStatus.next(status);
   }
 
   disconnect() {
@@ -47,43 +68,17 @@ export class AtokenContractService {
     this.address = undefined;
   }
 
-  public totalSupply(): Promise<BigNumber> {
-    return new Promise<BigNumber>((resolve, reject) => {
-      this.contract.methods.totalSupply().call().then((totalSupply) => {
-        resolve(new BigNumber(totalSupply));
+  public playerStatus(player: string): Promise<ePlayerStatus> {
+    return new Promise<ePlayerStatus>((resolve, reject) => {
+      this.contract.methods.playerStatus(player).call().then((playerStatus: string) => {
+        resolve(ePlayerStatus[PlayerStatus[+playerStatus]]);
       }).catch(reject);
     });
   }
 
-  public balanceOf(account: string): Promise<BigNumber> {
-    return new Promise<BigNumber>((resolve, reject) => {
-      this.contract.methods.balanceOf(account).call().then((bal) => {
-        resolve(new BigNumber(bal));
-      }).catch(reject);
-    })
-  }
-
-  public name(): Promise<string> {
-    return this.contract.methods.name().call();
-  }
-
-  public symbol(): Promise<string> {
-    return this.contract.methods.symbol().call();
-  }
-
-  public decimals(): Promise<number> {
-    return this.contract.methods.decimals().call();
-  }
-
-  public async computePrice(amount: BigNumber): Promise<BigNumber> {
-    return this.contract.methods.computePrice(amount).call();
-  }
-
-  public async buy(amount: BigNumber) {
+  public async register() {
     return new Promise<void>(async (resolve, reject) => {
-      const price = await this.computePrice(amount);
-      console.log("Buying price", price.toString());
-      this.contract.methods.buy(amount).send({from: this.blockchainService.status.account, value: price})
+      this.contract.methods.register().send({from: this.blockchainService.status.account})
       .once('receipt', receipt => {
         console.log(receipt);
       })
@@ -102,9 +97,9 @@ export class AtokenContractService {
 
   }
 
-  public async sell(amount: BigNumber) {
+  public async check() {
     return new Promise<void>(async (resolve, reject) => {
-      this.contract.methods.sell(amount).send({from: this.blockchainService.status.account})
+      this.contract.methods.check().send({from: this.blockchainService.status.account})
       .once('receipt', receipt => {
         console.log(receipt);
       })
@@ -120,8 +115,6 @@ export class AtokenContractService {
         reject(error);
       })
     });
+
   }
-
-
-
 }

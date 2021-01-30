@@ -38,4 +38,20 @@ contract GameMaster {
         }
     }
 
+    function check() external {
+        address player = msg.sender;
+        require(playerStatus[player] == PlayerStatus.Registered, "PLAYER MUST BE REGISTERED");
+        (bool didGet, bool hasSubscribed) = ISubscriptionChecker(subscriptionCheckerAddress).check(player, (playerStatus[player] != PlayerStatus.Pending));
+        console.log("GameMaster:check didGet", didGet);
+        console.log("GameMaster:check hasSubscribed", hasSubscribed);
+        if (didGet && hasSubscribed) {
+        } else if (didGet) {
+            playerStatus[player] = PlayerStatus.Unregistered;
+            emit PlayerStatusChanged(player, playerStatus[player]);
+        } else if (playerStatus[player] != PlayerStatus.Pending) {
+            playerStatus[player] = PlayerStatus.Pending;
+            emit PlayerStatusChanged(player, playerStatus[player]);
+        }
+    }
+
 }

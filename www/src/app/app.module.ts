@@ -24,6 +24,10 @@ import { FourComponent } from './_components/four/four.component';
 import { BlockchainStatusComponent } from './_components/blockchain-status/blockchain-status.component';
 import { AtokenComponent } from './_components/atoken/atoken.component';
 import { BalanceComponent } from './_components/balance/balance.component';
+import { MinerComponent } from './_components/miner/miner.component';
+import { GameMasterComponent } from './_components/gamemaster/gamemaster.component';
+import { TellorComponent } from './_components/tellor/tellor.component';
+import { SubscriptionCheckerComponent } from './_components/subscription-checker/subscription-checker.component';
 
 @NgModule({
   declarations: [
@@ -36,7 +40,11 @@ import { BalanceComponent } from './_components/balance/balance.component';
     FourComponent,
     BlockchainStatusComponent,
     AtokenComponent,
-    BalanceComponent
+    BalanceComponent,
+    MinerComponent,
+    GameMasterComponent,
+    TellorComponent,
+    SubscriptionCheckerComponent
   ],
   imports: [
     BrowserModule,

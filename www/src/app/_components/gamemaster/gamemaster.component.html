@@ -1,0 +1,10 @@
+<h1>GameMaster Contract</h1>
+<div *ngIf="!connected">Not connected</div>
+<div *ngIf="connected">
+    <button (click)="refresh(connected)">Refresh</button>
+    <div>address: {{address}}</div>
+    <div>My Status: {{statusText}}</div>
+    <button *ngIf="!isRegistered && !isPending" [disabled]="registering" (click)="register()">Register</button>
+    <button *ngIf="isPending" [disabled]="registering" (click)="register()">Update</button>
+    <button *ngIf="isRegistered" [disabled]="registering" (click)="check()">Check</button>
+</div>
