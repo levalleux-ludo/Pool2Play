@@ -1,0 +1,9 @@
+<p>metamask works!</p>
+<div *ngIf="!connected">
+    <button [disabled]="connecting" (click)="connect()">Connect with MetaMask</button>
+</div>
+<div *ngIf="connected">
+    <div>Account: {{account}}</div>
+    <div>Chain: {{chainId}}</div>
+    <button [disabled]="connecting" (click)="disconnect()">Disconnect</button>
+</div>

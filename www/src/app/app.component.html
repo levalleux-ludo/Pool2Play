@@ -25,6 +25,8 @@
             </a>
         </div>
         <div class="header-nav">
+            <app-blockchain-status></app-blockchain-status>
+            <app-portis></app-portis>
             <!-- <a href="javascript://" class="nav-link nav-icon">
                 <clr-icon shape="cloud"></clr-icon>
             </a>
@@ -36,10 +38,10 @@
     <nav class="subnav">
         <ul class="nav">
             <li class="nav-item">
-                <a class="nav-link active" href="javascript://">Subnav Link 1</a>
+                <a class="nav-link" routerLinkActive="active" routerLink="/1">Blockchain 1</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="javascript://">Subnav Link 2</a>
+                <a class="nav-link" routerLinkActive="active" routerLink="/2">Blockchain 2</a>
             </li>
         </ul>
     </nav>

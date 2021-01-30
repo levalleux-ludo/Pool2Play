@@ -1,0 +1,9 @@
+<div *ngIf="!status.connected && !status.connecting">Not connected</div>
+<div *ngIf="status.connecting">
+    Connecting to {{status.network}}
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</div>
+<div *ngIf="status.connected && !status.connecting">
+    Connected to {{status.network}}
+    <span>Account: {{status.account}}</span>
+</div>
