@@ -21,17 +21,21 @@ export class MinerController {
         const contract = req.query.contract as string;
         if (!contract) {
             res.status(400).send('Please specify contract in query parameters');
+            return;
         }
         const account = req.query.account as string;
         if (!account) {
             res.status(400).send('Please specify account in query parameters');
+            return;
         }
         try {
             const web3Provider = Web3Providers.one;
             const aToken = new ATokenContract(contract, web3Provider);
             aToken.balanceOf(account).then((balance) => {
                 res.send({balance: balance.toString()});
-            })
+            }).catch(e => {
+                throw e;
+            });
         } catch(e) {
             res.status(400).send(e);
             return;
