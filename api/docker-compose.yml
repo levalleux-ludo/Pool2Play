@@ -1,0 +1,11 @@
+version: '3'
+services:
+
+  p2pMiner:
+    build: .
+    container_name: 'p2pMiner'
+    ports:
+      - '8891:8888'
+    restart: always
+    image: levalleuxludo/my_repo:p2pMiner
+    env_file: .env
