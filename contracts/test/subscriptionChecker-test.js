@@ -9,6 +9,7 @@ let deployerAddr, account1Addr, account2Addr;
 const requestId = 123456789;
 const threshold = 15 * 60; // 15 min
 const tipIncrement = ethers.BigNumber.from(10).pow(16); // 0.01 ETH
+const aTokenPrice = ethers.constants.WeiPerEther.div(100); // 0.01 ETH
 
 describe("subscriptionChecker", function() {
     before('', async() => {
@@ -16,7 +17,7 @@ describe("subscriptionChecker", function() {
         deployerAddr = await deployer.getAddress();
         account1Addr = await account1.getAddress();
         account2Addr = await account2.getAddress();
-        const contracts = await deployContracts({ subscriptionChecker: [requestId, threshold, tipIncrement] });
+        const contracts = await deployContracts({ aToken: [aTokenPrice], subscriptionChecker: [requestId, threshold, tipIncrement] });
         tellor = contracts.tellor;
         subscriptionChecker = contracts.subscriptionChecker;
         aToken = contracts.aToken;

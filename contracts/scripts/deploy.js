@@ -20,6 +20,7 @@ if (fs.existsSync(addressesDataFile)) {
 const requestId = 123456789;
 const threshold = 15 * 60; // 15 min
 const tipIncrement = ethers.BigNumber.from(10).pow(16); // 0.01 ETH
+const aTokenPrice = ethers.constants.WeiPerEther.div(100); // 0.01 ETH
 
 
 async function main() {
@@ -47,7 +48,7 @@ async function main() {
     }
 
     // We get the contract to deploy
-    const { tellor, subscriptionChecker, gameMaster, aToken } = await deployContracts({ subscriptionChecker: [requestId, threshold, tipIncrement] });
+    const { tellor, subscriptionChecker, gameMaster, aToken } = await deployContracts({ aToken: [aTokenPrice], subscriptionChecker: [requestId, threshold, tipIncrement] });
     addContractAddress('aToken', aToken.address);
     addContractAddress('tellor', tellor.address);
     addContractAddress('subscriptionChecker', subscriptionChecker.address);

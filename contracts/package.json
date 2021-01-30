@@ -6,7 +6,8 @@
     "scripts": {
         "build": "hardhat compile",
         "test": "hardhat test",
-        "deploy": "hardhat run scripts/deploy.js"
+        "deploy": "hardhat run scripts/deploy.js",
+        "faucet:ganache": "hardhat run scripts/ganache_faucet.js --network ganache"
     },
     "keywords": [],
     "author": "",

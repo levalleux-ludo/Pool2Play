@@ -15,9 +15,13 @@ function getBalanceAsNumber(bn, decimals, accuracy) {
 }
 
 async function deployContracts(args = undefined) {
-
+    let params;
+    params = [];
+    if (args && args.aToken) {
+        params = args.aToken;
+    }
     const AToken = await hre.ethers.getContractFactory("AToken");
-    const aToken = await AToken.deploy();
+    const aToken = await AToken.deploy(...params);
     await aToken.deployed();
 
     const TellorPlayground = await hre.ethers.getContractFactory("TellorPlayground");

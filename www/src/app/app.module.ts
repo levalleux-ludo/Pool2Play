@@ -22,6 +22,8 @@ import { PortisComponent } from './_components/portis/portis.component';
 import { ThreeComponent } from './_components/three/three.component';
 import { FourComponent } from './_components/four/four.component';
 import { BlockchainStatusComponent } from './_components/blockchain-status/blockchain-status.component';
+import { AtokenComponent } from './_components/atoken/atoken.component';
+import { BalanceComponent } from './_components/balance/balance.component';
 
 @NgModule({
   declarations: [
@@ -32,7 +34,9 @@ import { BlockchainStatusComponent } from './_components/blockchain-status/block
     PortisComponent,
     ThreeComponent,
     FourComponent,
-    BlockchainStatusComponent
+    BlockchainStatusComponent,
+    AtokenComponent,
+    BalanceComponent
   ],
   imports: [
     BrowserModule,
