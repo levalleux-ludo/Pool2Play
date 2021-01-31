@@ -41,6 +41,8 @@ async function deployContracts(args = undefined) {
     const gameMaster = await GameMaster.deploy(subscriptionChecker.address);
     await gameMaster.deployed();
 
+    await subscriptionChecker.transferOwnership(gameMaster.address);
+
     return { aToken, tellor, subscriptionChecker, gameMaster };
 
 

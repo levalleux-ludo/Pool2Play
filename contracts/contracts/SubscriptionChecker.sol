@@ -4,10 +4,11 @@ pragma solidity ^0.7.0;
 import "hardhat/console.sol";
 import "./usingtellor/UsingTellor.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "./ISubscriptionChecker.sol";
 import "./Interface/ITellor.sol";
 
-contract SubscriptionChecker is UsingTellor, ISubscriptionChecker {
+contract SubscriptionChecker is UsingTellor, ISubscriptionChecker, Ownable {
   using SafeMath for uint256;
   
   uint256 public requestId;
@@ -16,7 +17,7 @@ contract SubscriptionChecker is UsingTellor, ISubscriptionChecker {
   address payable telloraddress;
   address public subscribedToken;
 
-  constructor(address payable _telloraddress, address _subscribedToken, uint256 _requestId, uint256 _threshold, uint256 _tipIncrement) UsingTellor(_telloraddress) {
+  constructor(address payable _telloraddress, address _subscribedToken, uint256 _requestId, uint256 _threshold, uint256 _tipIncrement) UsingTellor(_telloraddress) Ownable() {
     telloraddress = _telloraddress;
     requestId = _requestId;
     threshold = _threshold;
@@ -24,7 +25,12 @@ contract SubscriptionChecker is UsingTellor, ISubscriptionChecker {
     subscribedToken = _subscribedToken;
   }
 
+  function setThreshold(uint256 _threshold) external onlyOwner {
+    threshold = _threshold;
+  }
+
   function check(address account, bool tip) external override returns (bool didGet, bool hasSubscribed) {
+    require((msg.sender == owner()) || (msg.sender == account), "SubscriptionChecker: NOT AUTHORIZED" );
     uint _timestamp;
     uint _subscriptionBalance;
     bytes32 paramsHash = ITellor(telloraddress).addParams(requestId, abi.encode(subscribedToken, account));
