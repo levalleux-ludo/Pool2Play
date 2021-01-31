@@ -13,6 +13,7 @@ export class SubscriptionCheckerComponent implements OnInit {
   address;
   requestId = 123456789;
   subscribedToken;
+  threshold;
 
   constructor(
     private subscriptionCheckerContract: SubscriptionCheckerContractService,
@@ -31,6 +32,9 @@ export class SubscriptionCheckerComponent implements OnInit {
     if (connected) {
       this.address = this.subscriptionCheckerContract.address;
       this.subscribedToken = await this.subscriptionCheckerContract.subscribedToken();
+      const threshold_bn = await this.subscriptionCheckerContract.threshold();
+      const threshold_min_bn = threshold_bn.div(60).integerValue();
+      this.threshold = `${threshold_min_bn.toString()}'${threshold_bn.minus(threshold_min_bn.multipliedBy(60))}''`;
     } else {
       this.address = undefined;
     }

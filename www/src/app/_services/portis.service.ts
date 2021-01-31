@@ -4,7 +4,7 @@ import Portis from '@portis/web3';
 import Web3 from 'web3';
 import { WEB3 } from '../_helpers/tokens';
 
-const PORTIS_API_KEY = '0c1de70d-2cfe-4336-8a87-ed4704e9457c';
+const PORTIS_API_KEY = 'fb44397f-1366-4876-ba76-247f27e680b0';
 
 const ganache = {
   chainId: 1337,

@@ -15,6 +15,7 @@ export class GameMasterComponent implements OnInit {
   statusText;
   isRegistered = false;
   isPending = false;
+  message;
   set status(value: ePlayerStatus) {
     this.statusText = PlayerStatus[value];
     this.isRegistered = value === ePlayerStatus.Registered;
@@ -35,6 +36,12 @@ export class GameMasterComponent implements OnInit {
       if (status !== undefined) {
         this.status = status;
         this.refresh(this.connected);
+        if (this.registering && (status === ePlayerStatus.Unregistered)) {
+          this.message = "Registration Failed. Please subscribed to the Pool.";
+        } else {
+          this.message = undefined;
+        }
+        this.registering = false;
       }
     })
   }

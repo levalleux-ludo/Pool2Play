@@ -19,6 +19,7 @@ export class TellorContractService {
 
   tipAdded = new Subject<any>();
   newValue = new Subject<any>();
+  onTransfer = new Subject<any>();
 
   constructor(
     @Inject(WEB3) private web3: Web3,
@@ -38,6 +39,10 @@ export class TellorContractService {
       }
     })
 
+  }
+
+  public get isConnected(): boolean {
+    return this.contract !== undefined;
   }
 
   async connect(address: string) {
@@ -66,6 +71,18 @@ export class TellorContractService {
         const value = event.returnValues._value;
         console.log('Tellor receive event NewValue', reqId.toString(), paramsHash, time.toString(), value.toString());
         this.newValue.next({reqId, paramsHash, time, value});
+      }
+    });
+    this.contract.events.Transfer({}, (error, event) => {
+      if (error) {
+        console.error(error);
+      } else {
+        console.log('Tellor receive event Transfer', JSON.stringify(event));
+        const sender = event.returnValues.from;
+        const recipient = event.returnValues.to;
+        const amount = event.returnValues.value;
+        console.log('Tellor receive event Transfer', sender, recipient, amount.toString());
+        this.newValue.next({sender, recipient, amount});
       }
     });
     this.connected.next(true);
@@ -114,5 +131,27 @@ export class TellorContractService {
       });
 
   }
+
+  public name(): Promise<string> {
+    return this.contract.methods.name().call();
+  }
+
+  public symbol(): Promise<string> {
+    return this.contract.methods.symbol().call();
+  }
+
+  public decimals(): Promise<number> {
+    return this.contract.methods.decimals().call();
+  }
+
+
+  public balanceOf(account: string): Promise<BigNumber> {
+    return new Promise<BigNumber>((resolve, reject) => {
+      this.contract.methods.balanceOf(account).call().then((bal) => {
+        resolve(new BigNumber(bal));
+      }).catch(reject);
+    })
+  }
+
 
 }

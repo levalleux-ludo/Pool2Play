@@ -5,6 +5,7 @@ import { WEB3 } from '../_helpers/tokens';
 import { BlockchainService } from './blockchain.service';
 import subscriptionCheckerJSON from '../../../../contracts/artifacts/contracts/SubscriptionChecker.sol/SubscriptionChecker.json';
 import addresses from '../../../../contracts/contracts/addresses.json';
+import { BigNumber } from 'bignumber.js';
 
 @Injectable({
   providedIn: 'root'
@@ -36,6 +37,10 @@ export class SubscriptionCheckerContractService {
 
   }
 
+  public get isConnected(): boolean {
+    return this.contract !== undefined;
+  }
+
   async connect(address: string) {
     this.contract = new this.web3.eth.Contract(subscriptionCheckerJSON.abi as any, address);
     this.address = address;
@@ -51,5 +56,14 @@ export class SubscriptionCheckerContractService {
   async subscribedToken(): Promise<string> {
     return this.contract.methods.subscribedToken().call();
   }
+
+  async threshold(): Promise<BigNumber> {
+    return new Promise<BigNumber>((resolve, reject) => {
+      this.contract.methods.threshold().call().then((threshold) => {
+        resolve(new BigNumber(threshold));
+      }).catch(reject);
+    })
+  }
+
 
 }

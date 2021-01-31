@@ -78,6 +78,7 @@ export class GameMasterContractService {
 
   public async register() {
     return new Promise<void>(async (resolve, reject) => {
+      // this.myStatus.next(ePlayerStatus.Pending);
       this.contract.methods.register().send({from: this.blockchainService.status.account})
       .once('receipt', receipt => {
         console.log(receipt);

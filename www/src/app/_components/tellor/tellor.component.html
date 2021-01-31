@@ -3,6 +3,9 @@
 <div *ngIf="connected">
     <div>address: {{address}}</div>
     <div>requestId: {{requestId}}</div>
+    <div>SubscriptionChecker balance:
+        <app-balance [balance]="subscriptionCheckerBalance" [decimals]="decimals" [symbol]="symbol"></app-balance>
+    </div>
     <div>
         <h2>Events</h2>
         <div *ngFor="let event of events">{{event}}</div>
