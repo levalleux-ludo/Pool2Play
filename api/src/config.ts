@@ -66,6 +66,16 @@ export const config = (): any => {
                 // wssUrl: `wss://rpc-mumbai.maticvigil.com/ws/v1/${process.env.MATICVIGIL_API_KEY}`,
                 wssUrl: `wss://ws-mumbai.matic.today`,
             },
+            bscTest: {
+                chainId: 97,
+                name: 'Binance SC TestNet',
+                nodeUrl: `https://data-seed-prebsc-1-s1.binance.org:8545`,
+            },
+            bsc: {
+                chainId: 56,
+                name: 'Binance SC',
+                nodeUrl: `https://bsc-dataseed.binance.org`,
+            },
         },
     };
 }

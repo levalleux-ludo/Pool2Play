@@ -1,3 +1,4 @@
+import { environment } from './../../environments/environment';
 import { BlockchainService } from './blockchain.service';
 import { Inject, Injectable } from '@angular/core';
 import Portis from '@portis/web3';
@@ -5,11 +6,6 @@ import Web3 from 'web3';
 import { WEB3 } from '../_helpers/tokens';
 
 const PORTIS_API_KEY = 'fb44397f-1366-4876-ba76-247f27e680b0';
-
-const ganache = {
-  chainId: 1337,
-  nodeUrl: 'http://localhost:7545'
-}
 
 @Injectable({
   providedIn: 'root'
@@ -40,7 +36,7 @@ export class PortisService {
       try {
         const ready = await this.isReady();
         if (!ready) {
-          this.portis = new Portis(PORTIS_API_KEY, (network === 'ganache') ? ganache : network);
+          this.portis = new Portis(PORTIS_API_KEY, (environment.other_networks[network]) ? environment.other_networks[network] : network);
           this.chainId = this.portis.config.network.chainId;
           this.network = network;
           this.web3.setProvider(this.portis.provider as any);
@@ -53,7 +49,7 @@ export class PortisService {
             resolve({account: walletAddress, provider: this.portis.provider});
           });
         } else if (network !== this.network) {
-          this.portis.changeNetwork((network === 'ganache') ? ganache : network);
+          this.portis.changeNetwork((environment.other_networks[network]) ? environment.other_networks[network] : network);
           this.chainId = this.portis.config.network.chainId;
           this.network = network;
           this.web3.setProvider(this.portis.provider as any);

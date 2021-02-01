@@ -23,11 +23,13 @@ export class AtokenContractService {
   ) {
     this.blockchainService.connectionStatus.subscribe((status) => {
       if (status.connected) {
+        console.log('AtokenContractService onBlockchain connection', status);
         const address = addresses.aToken[status.chainId];
         if (address) {
           this.connect(address);
         } else {
-          throw new Error('Unable to find address for contract aToken on chain ' + status.chainId);
+          console.warn('Unable to find address for contract aToken on chain ' + status.chainId);
+          this.disconnect();
         }
       } else {
         this.disconnect();

@@ -1,4 +1,4 @@
-import { TellorContract } from './web3/tellor.contract';
+import { TellorContract, TellorContractE } from './web3/tellor.contract';
 import { MinerService } from './services/miner.service';
 import { GameMasterContract } from './web3/gameMaster.contract';
 import { SubscriptionCheckerContract } from './web3/subscriptionChecker.contract';
@@ -8,7 +8,7 @@ import { getMessage } from './message';
 import { TestController } from './api.controllers/testController';
 import { RootController } from './api.controllers/rootController';
 import { SubscriptionCheckerController } from './api.controllers/subscription.controller';
-import { Web3Providers, Addresses } from './web3/web3.provider';
+import { Web3Providers, Addresses, EthersWeb3Provider } from './web3/web3.provider';
 
 const main = async () => {
 
@@ -30,10 +30,11 @@ const main = async () => {
     );
     const subscriptionCheckerController = new SubscriptionCheckerController(subscriptionCheckerContract, gameMasterContract);
 
-    const tellorContract = new TellorContract(
+    const ethersProvider = new EthersWeb3Provider(web3Provider.network);
+
+    const tellorContract = new TellorContractE(
         ((Addresses as any).two as any).tellor,
-        web3Provider,
-        web3Provider.account
+        ethersProvider.signer
     )
     const minerService = new MinerService(tellorContract);
 

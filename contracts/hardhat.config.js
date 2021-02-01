@@ -37,7 +37,9 @@ module.exports = {
     solidity: "0.7.0",
     defaultNetwork: "hardhat",
     networks: {
-        hardhat: {},
+        hardhat: {
+            layer1: "hardhat"
+        },
         ganache: {
             chainId: 1337,
             url: "http://192.168.1.11:7545",
@@ -47,6 +49,7 @@ module.exports = {
                 mnemonic: process.env.MNEMONIC,
                 path: "m/44'/60'/0'/0",
             },
+            layer1: 1337
         },
         matic: {
             chainId: 137,
@@ -67,6 +70,29 @@ module.exports = {
                 mnemonic: process.env.MNEMONIC,
                 path: "m/44'/60'/0'/0",
             },
+            layer1: 5,
+        },
+        bscTest: {
+            chainId: 97,
+            url: `https://data-seed-prebsc-1-s1.binance.org:8545`,
+            accounts: {
+                count: 10,
+                initialIndex: 0,
+                mnemonic: process.env.MNEMONIC,
+                path: "m/44'/60'/0'/0",
+            },
+            layer1: 5,
+        },
+        bsc: {
+            chainId: 56,
+            url: `https://bsc-dataseed.binance.org`,
+            accounts: {
+                count: 10,
+                initialIndex: 0,
+                mnemonic: process.env.MNEMONIC,
+                path: "m/44'/60'/0'/0",
+            },
+            layer1: 5,
         },
         goerli: {
             chainId: 5,

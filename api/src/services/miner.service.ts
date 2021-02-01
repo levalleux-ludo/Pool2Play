@@ -1,9 +1,9 @@
 import { Web3Provider, Web3Providers } from './../web3/web3.provider';
 import { ATokenContract } from './../web3/aToken.contract';
-import { TellorContract } from './../web3/tellor.contract';
+import { ITellorContract } from './../web3/tellor.contract';
 export class MinerService {
     constructor(
-        private tellorContract: TellorContract
+        private tellorContract: ITellorContract
     ) {
         this.tellorContract.onTipAdded((reqId, paramsHash, tip) => {
             console.log('Miner: received TipAdded', reqId, paramsHash, tip);

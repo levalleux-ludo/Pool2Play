@@ -1,3 +1,4 @@
+import { Web3SubscriberService, Subscription } from './web3-subscriber.service';
 import { BigNumber } from 'bignumber.js';
 import { Inject, Injectable } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
@@ -15,6 +16,7 @@ export class TellorContractService {
   address: string;
   contract: any;
   subscriptions = [];
+  subscription: Subscription;
 
   connected = new BehaviorSubject<boolean>(false);
 
@@ -24,16 +26,19 @@ export class TellorContractService {
 
   constructor(
     @Inject(WEB3) private web3: Web3,
-    private blockchainService: BlockchainService
+    private blockchainService: BlockchainService,
+    private subscriberService: Web3SubscriberService
 
   ) {
     this.blockchainService.connectionStatus.subscribe((status) => {
       if (status.connected) {
+        console.log('TellorContractService onBlockchain connection', status);
         const address = addresses.tellor[status.chainId];
         if (address) {
           this.connect(address);
         } else {
-          throw new Error('Unable to find address for contract tellor on chain ' + status.chainId);
+          console.warn('Unable to find address for contract tellor on chain ' + status.chainId);
+          this.disconnect();
         }
       } else {
         this.disconnect();
@@ -52,52 +57,99 @@ export class TellorContractService {
     }
     this.contract = new this.web3.eth.Contract(tellorJSON.abi as any, address);
     this.address = address;
-    this.subscriptions.push(this.contract.events.TipAdded({}, (error, event) => {
-      if (error) {
-        console.error(error);
-      } else {
-        console.log('Tellor receive event TipAdded', JSON.stringify(event));
-        const reqId = event.returnValues._requestId;
-        const paramsHash = event.returnValues._paramsHash;
-        const tip = event.returnValues._tip;
-        console.log('Tellor receive event TipAdded', reqId.toString(), paramsHash, tip.toString());
-        this.tipAdded.next({reqId, paramsHash, tip});
+    await this.subscriberService.addContract('TellorPlayground', address, tellorJSON.abi);
+    this.subscription = this.subscriberService.addSubscription(address, (event) => {
+      console.log('Tellor: receive event', event);
+      switch (event.name) {
+        case 'TipAdded': {
+          console.log('Tellor receive event TipAdded', JSON.stringify(event));
+          const reqId = event.returnValues._requestId;
+          const paramsHash = event.returnValues._paramsHash;
+          const tip = event.returnValues._tip;
+          console.log('Tellor receive event TipAdded', reqId.toString(), paramsHash, tip.toString());
+          this.tipAdded.next({reqId, paramsHash, tip});
+          break;
+        }
+        case 'NewValue': {
+          console.log('Tellor receive event NewValue', JSON.stringify(event));
+          const reqId = event.returnValues._requestId;
+          const paramsHash = event.returnValues._paramsHash;
+          const time = event.returnValues._time;
+          const value = event.returnValues._value;
+          console.log('Tellor receive event NewValue', reqId.toString(), paramsHash, time.toString(), value.toString());
+          this.newValue.next({reqId, paramsHash, time, value});
+          break;
+        }
+        case 'Transfer': {
+          console.log('Tellor receive event Transfer', JSON.stringify(event));
+          const sender = event.returnValues.from;
+          const recipient = event.returnValues.to;
+          const amount = event.returnValues.value;
+          console.log('Tellor receive event Transfer', sender, recipient, amount.toString());
+          this.onTransfer.next({sender, recipient, amount});
+          break;
+        }
+        default: {
+          console.log('Tellor: ignore event', event.name);
+          break;
+        }
       }
-    }));
-    this.subscriptions.push(this.contract.events.NewValue({}, (error, event) => {
-      if (error) {
-        console.error(error);
-      } else {
-        console.log('Tellor receive event NewValue', JSON.stringify(event));
-        const reqId = event.returnValues._requestId;
-        const paramsHash = event.returnValues._paramsHash;
-        const time = event.returnValues._time;
-        const value = event.returnValues._value;
-        console.log('Tellor receive event NewValue', reqId.toString(), paramsHash, time.toString(), value.toString());
-        this.newValue.next({reqId, paramsHash, time, value});
-      }
-    }));
-    this.subscriptions.push(this.contract.events.Transfer({}, (error, event) => {
-      if (error) {
-        console.error(error);
-      } else {
-        console.log('Tellor receive event Transfer', JSON.stringify(event));
-        const sender = event.returnValues.from;
-        const recipient = event.returnValues.to;
-        const amount = event.returnValues.value;
-        console.log('Tellor receive event Transfer', sender, recipient, amount.toString());
-        this.onTransfer.next({sender, recipient, amount});
-      }
-    }));
+    });
+
+
+    // this.subscriptions.push(this.contract.events.TipAdded({}, (error, event) => {
+    //   if (error) {
+    //     console.error(error);
+    //   } else {
+    //     console.log('Tellor receive event TipAdded', JSON.stringify(event));
+    //     const reqId = event.returnValues._requestId;
+    //     const paramsHash = event.returnValues._paramsHash;
+    //     const tip = event.returnValues._tip;
+    //     console.log('Tellor receive event TipAdded', reqId.toString(), paramsHash, tip.toString());
+    //     this.tipAdded.next({reqId, paramsHash, tip});
+    //   }
+    // }));
+    // this.subscriptions.push(this.contract.events.NewValue({}, (error, event) => {
+    //   if (error) {
+    //     console.error(error);
+    //   } else {
+    //     console.log('Tellor receive event NewValue', JSON.stringify(event));
+    //     const reqId = event.returnValues._requestId;
+    //     const paramsHash = event.returnValues._paramsHash;
+    //     const time = event.returnValues._time;
+    //     const value = event.returnValues._value;
+    //     console.log('Tellor receive event NewValue', reqId.toString(), paramsHash, time.toString(), value.toString());
+    //     this.newValue.next({reqId, paramsHash, time, value});
+    //   }
+    // }));
+    // this.subscriptions.push(this.contract.events.Transfer({}, (error, event) => {
+    //   if (error) {
+    //     console.error(error);
+    //   } else {
+    //     console.log('Tellor receive event Transfer', JSON.stringify(event));
+    //     const sender = event.returnValues.from;
+    //     const recipient = event.returnValues.to;
+    //     const amount = event.returnValues.value;
+    //     console.log('Tellor receive event Transfer', sender, recipient, amount.toString());
+    //     this.onTransfer.next({sender, recipient, amount});
+    //   }
+    // }));
     this.connected.next(true);
   }
 
   disconnect() {
+    //TODO: remove contract from subscriber service
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
     this.connected.next(false);
     this.contract = undefined;
     this.address = undefined;
     for(const subscription of this.subscriptions) {
-      subscription.unsubscribe();
+      subscription.unsubscribe(function(error, success){
+        if(success)
+            console.log('Successfully unsubscribed!');
+    });
     }
     this.subscriptions = [];
   }

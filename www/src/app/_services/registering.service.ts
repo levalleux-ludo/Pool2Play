@@ -24,20 +24,20 @@ export class RegisteringService {
     private tellorContract: TellorContractService,
     private blockchainService: BlockchainService
   ) {
-    this.gameMasterContract.myStatus.subscribe((myStatus) => {
-      console.log('Registering: status changed to', PlayerStatus[myStatus], myStatus, ePlayerStatus.Pending);
-      if (this.waitStatus && (myStatus !== undefined)) {
-        this.waitStatus = false;
-        console.log('Registering: catch pending status', PlayerStatus[myStatus]);
-        if (!this.waitCheck && !this.waitNewValue && this.callback) {
-          console.log('Registering: resolve after status changed');
-          this.resolve();
-          this.resolve = undefined;
-          this.reject = undefined;
-          this.callback = undefined;
-        }
-      }
-    });
+    // this.gameMasterContract.myStatus.subscribe((myStatus) => {
+    //   console.log('Registering: status changed to', PlayerStatus[myStatus], myStatus, ePlayerStatus.Pending);
+    //   if (this.waitStatus && (myStatus !== undefined)) {
+    //     this.waitStatus = false;
+    //     console.log('Registering: catch pending status', PlayerStatus[myStatus]);
+    //     if (!this.waitCheck && !this.waitNewValue && this.callback) {
+    //       console.log('Registering: resolve after status changed');
+    //       this.resolve();
+    //       this.resolve = undefined;
+    //       this.reject = undefined;
+    //       this.callback = undefined;
+    //     }
+    //   }
+    // });
     this.subscriptionCheckerContract.onCheck.subscribe((onCheck) => {
       if (this.waitCheck && (onCheck.account.toLowerCase() === this.blockchainService.status.account.toLowerCase())) {
         this.waitCheck = false;
@@ -45,7 +45,7 @@ export class RegisteringService {
         if (onCheck.tipAdded) {
           this.waitNewValue = true;
         } else {
-          if (!this.waitStatus && !this.waitNewValue && this.callback) {
+          if (!this.waitNewValue && this.callback) {
             console.log('Registering: resolve after Check received');
             this.resolve();
             this.resolve = undefined;

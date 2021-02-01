@@ -6,6 +6,7 @@ import { WEB3 } from '../_helpers/tokens';
 import gameMasterJSON from '../../../../contracts/artifacts/contracts/GameMaster.sol/GameMaster.json';
 import addresses from '../../../../contracts/contracts/addresses.json';
 import BigNumber from 'bignumber.js';
+import { Web3SubscriberService, Subscription } from './web3-subscriber.service';
 
 export enum ePlayerStatus {
   Unregistered = 0,
@@ -22,22 +23,26 @@ export class GameMasterContractService {
   address: string;
   contract: any;
   subscriptions = [];
+  subscription: Subscription;
 
   connected = new BehaviorSubject<boolean>(false);
   myStatus = new BehaviorSubject<number | undefined>(undefined);
 
   constructor(
     @Inject(WEB3) private web3: Web3,
-    private blockchainService: BlockchainService
+    private blockchainService: BlockchainService,
+    private subscriberService: Web3SubscriberService
   ) {
     console.log('PlayerStatus', PlayerStatus);
     this.blockchainService.connectionStatus.subscribe((status) => {
       if (status.connected) {
+        console.log('GameMasterContractService onBlockchain connection', status);
         const address = addresses.gameMaster[status.chainId];
         if (address) {
           this.connect(address);
         } else {
-          throw new Error('Unable to find address for contract gameMaster on chain ' + status.chainId);
+          console.warn('Unable to find address for contract gameMaster on chain ' + status.chainId);
+          this.disconnect();
         }
       } else {
         this.disconnect();
@@ -51,28 +56,53 @@ export class GameMasterContractService {
     }
     this.contract = new this.web3.eth.Contract(gameMasterJSON.abi as any, address);
     this.address = address;
-    this.subscriptions.push(this.contract.events.PlayerStatusChanged({}, (error, event) => {
-      if (error) {
-        console.error(error);
-      } else {
-        console.log('Game Master receive event', JSON.stringify(event));
-        if (event.returnValues.player.toLowerCase() === this.blockchainService.status.account.toLowerCase()) {
-          const newStatus = parseInt(event.returnValues.status.toString());
-          this.myStatus.next(ePlayerStatus[PlayerStatus[newStatus]]);
+    await this.subscriberService.addContract('GameMaster', address, gameMasterJSON.abi);
+    this.subscription = this.subscriberService.addSubscription(address, (event) => {
+      console.log('GameMaster: receive event', event);
+      switch (event.name) {
+        case 'PlayerStatusChanged': {
+          console.log('GameMaster receive event PlayerStatusChanged', JSON.stringify(event));
+          if (event.returnValues.player.toLowerCase() === this.blockchainService.status.account.toLowerCase()) {
+            const newStatus = parseInt(event.returnValues.status.toString());
+            this.myStatus.next(ePlayerStatus[PlayerStatus[newStatus]]);
+          }
+          break;
+        }
+        default: {
+          console.log('GameMaster: ignore event', event.name);
+          break;
         }
       }
-    }));
+    });
+    // this.subscriptions.push(this.contract.events.PlayerStatusChanged({}, (error, event) => {
+    //   if (error) {
+    //     console.error(error);
+    //   } else {
+    //     console.log('Game Master receive event', JSON.stringify(event));
+    //     if (event.returnValues.player.toLowerCase() === this.blockchainService.status.account.toLowerCase()) {
+    //       const newStatus = parseInt(event.returnValues.status.toString());
+    //       this.myStatus.next(ePlayerStatus[PlayerStatus[newStatus]]);
+    //     }
+    //   }
+    // }));
     this.connected.next(true);
     const status = await this.playerStatus(this.blockchainService.status.account);
     this.myStatus.next(status);
   }
 
   disconnect() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
     this.connected.next(false);
     this.contract = undefined;
     this.address = undefined;
     for(const subscription of this.subscriptions) {
-      subscription.unsubscribe();
+      console.log('unsubscribe from contract event', subscription);
+      subscription.unsubscribe(function(error, success){
+        if(success)
+            console.log('Successfully unsubscribed!');
+    });
     }
     this.subscriptions = [];
   }

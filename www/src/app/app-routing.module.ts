@@ -9,10 +9,11 @@ import { Routes, RouterModule } from '@angular/router';
 
 
 const routes: Routes = [
-  { path: '1', component: OneComponent, data: { network: 'ganache'}  },
-  // { path: '1', component: OneComponent, data: { network: 'goerli'}  },
-  { path: '2', component: TwoComponent, data: { network: 'ganache'} },
+  // { path: '1', component: OneComponent, data: { network: 'ganache'}  },
+  { path: '1', component: OneComponent, data: { network: 'goerli'}  },
+  // { path: '2', component: TwoComponent, data: { network: 'ganache'} },
   // { path: '2', component: TwoComponent, data: { network: 'maticMumbai'} },
+  { path: '2', component: TwoComponent, data: { network: 'bscTest'} },
   { path: 'miner', component: MinerComponent },
   // { path: '3', component: ThreeComponent, data: { network: 'goerli'}  },
   // { path: '4', component: ThreeComponent, data: { network: 'matic'} },

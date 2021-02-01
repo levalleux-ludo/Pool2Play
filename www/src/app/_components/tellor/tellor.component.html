@@ -10,7 +10,7 @@
         <h2>Events</h2>
         <div *ngFor="let event of events">{{event}}</div>
     </div>
-    <!-- <button [disabled]="waiting" (click)="submittingValue = true">SubmitValue</button> -->
+    <button [disabled]="waiting" (click)="submittingValue = true">SubmitValue</button>
     <div *ngIf="submittingValue">
         <input #value type="number" [value]=0 min=0>
         <button [disabled]="waiting" (click)="submitValue(value.value)">Apply</button>

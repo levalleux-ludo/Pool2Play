@@ -14,7 +14,7 @@ function getBalanceAsNumber(bn, decimals, accuracy) {
     return r4;
 }
 
-async function deployContracts(args = undefined) {
+async function deployContractsB1(args = undefined) {
     let params;
     params = [];
     if (args && args.aToken) {
@@ -23,6 +23,23 @@ async function deployContracts(args = undefined) {
     const AToken = await hre.ethers.getContractFactory("AToken");
     const aToken = await AToken.deploy(...params);
     await aToken.deployed();
+
+    return { aToken };
+
+
+}
+
+async function deployContracts(args = undefined) {
+    const { aToken } = await deployContractsB1(args);
+    // add aToken.address in first position of subscriptionChecker args
+    args.subscriptionChecker = [aToken.address, ...args.subscriptionChecker];
+    const { tellor, subscriptionChecker, gameMaster } = await deployContractsB2(args);
+    return { aToken, tellor, subscriptionChecker, gameMaster };
+}
+
+async function deployContractsB2(args = undefined) {
+    let params;
+    params = [];
 
     const TellorPlayground = await hre.ethers.getContractFactory("TellorPlayground");
     const tellor = await TellorPlayground.deploy();
@@ -33,7 +50,7 @@ async function deployContracts(args = undefined) {
     if (args && args.subscriptionChecker) {
         params = args.subscriptionChecker;
     }
-    const subscriptionChecker = await SubscriptionChecker.deploy(tellor.address, aToken.address, ...params);
+    const subscriptionChecker = await SubscriptionChecker.deploy(tellor.address, ...params);
     await subscriptionChecker.deployed();
     await tellor.faucet(subscriptionChecker.address);
 
@@ -43,7 +60,7 @@ async function deployContracts(args = undefined) {
 
     await subscriptionChecker.transferOwnership(gameMaster.address);
 
-    return { aToken, tellor, subscriptionChecker, gameMaster };
+    return { tellor, subscriptionChecker, gameMaster };
 
 
 }
@@ -62,5 +79,7 @@ module.exports = {
     revertMessage,
     getBalanceAsNumber,
     deployContracts,
+    deployContractsB1,
+    deployContractsB2,
     computeParamsHash
 }

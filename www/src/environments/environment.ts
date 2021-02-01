@@ -3,7 +3,17 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  other_networks: {
+    ganache: {
+      chainId: 1337,
+      nodeUrl: 'http://localhost:7545'
+    },
+    bscTest: {
+      chainId: 97,
+      nodeUrl: 'https://data-seed-prebsc-1-s1.binance.org:8545'
+    },
+  }
 };
 
 /*
