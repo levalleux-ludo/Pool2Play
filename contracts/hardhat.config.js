@@ -70,7 +70,7 @@ module.exports = {
                 mnemonic: process.env.MNEMONIC,
                 path: "m/44'/60'/0'/0",
             },
-            layer1: 5,
+            layer1: 97,
         },
         bscTest: {
             chainId: 97,

@@ -15,10 +15,11 @@ export interface INetwork {
 
 const NETWORKS = {
     // one: 'ganache',
-    one: 'goerli',
+    // one: 'goerli',
+    one: 'bscTest',
     // two: 'ganache'
-    // two: 'mumbai'
-    two: 'bscTest'
+    two: 'mumbai'
+    // two: 'bscTest'
 }
 
 function getBalanceAsNumber(
