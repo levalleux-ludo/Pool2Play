@@ -5,7 +5,7 @@ import aTokenABI from '../../../contracts/artifacts/contracts/AToken.sol/AToken.
 
 export class ATokenContract extends Web3Contract {
     public constructor(address: string, web3Provider: Web3Provider) {
-        super(address, (aTokenABI as any).abi, web3Provider);
+        super(address, (aTokenABI as any).abi, web3Provider.web3);
     }
     public totalSupply(): Promise<BigNumber> {
         return this.contract.methods.totalSupply().call();

@@ -1,5 +1,8 @@
+import { RegisteringService } from './../../_services/registering.service';
 import { GameMasterContractService, ePlayerStatus, PlayerStatus } from './../../_services/gamemaster-contract.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { BlockchainService } from 'src/app/_services/blockchain.service';
 
 @Component({
@@ -7,7 +10,9 @@ import { BlockchainService } from 'src/app/_services/blockchain.service';
   templateUrl: './gamemaster.component.html',
   styleUrls: ['./gamemaster.component.scss']
 })
-export class GameMasterComponent implements OnInit {
+export class GameMasterComponent implements OnInit, OnDestroy {
+
+  private unsubscribe$ = new Subject<void>();
 
   connected = false;
   address;
@@ -15,6 +20,7 @@ export class GameMasterComponent implements OnInit {
   statusText;
   isRegistered = false;
   isPending = false;
+  events = [];
   message;
   set status(value: ePlayerStatus) {
     this.statusText = PlayerStatus[value];
@@ -24,16 +30,28 @@ export class GameMasterComponent implements OnInit {
 
   constructor(
     private gameMasterContract: GameMasterContractService,
-    private blockchainService: BlockchainService
+    private blockchainService: BlockchainService,
+    private registeringService: RegisteringService
 
   ) { }
 
+
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+  }
+
   ngOnInit(): void {
-    this.gameMasterContract.connected.subscribe((connected) => {
+    this.gameMasterContract.connected
+    .pipe(takeUntil(this.unsubscribe$))
+    .subscribe((connected) => {
       this.refresh(connected);
     });
-    this.gameMasterContract.myStatus.subscribe((status) => {
+    this.gameMasterContract.myStatus
+    .pipe(takeUntil(this.unsubscribe$))
+    .subscribe((status) => {
       if (status !== undefined) {
+        this.events.push(`Receive MyStatus event: ${PlayerStatus[status]}`);
         this.status = status;
         this.refresh(this.connected);
         if (this.registering && (status === ePlayerStatus.Unregistered)) {
@@ -58,7 +76,7 @@ export class GameMasterComponent implements OnInit {
 
   register() {
     this.registering = true;
-    this.gameMasterContract.register().finally(() => {
+    this.registeringService.register().finally(() => {
       this.registering = false;
       this.refresh(this.connected);
     });
@@ -66,7 +84,7 @@ export class GameMasterComponent implements OnInit {
 
   check() {
     this.registering = true;
-    this.gameMasterContract.check().finally(() => {
+    this.registeringService.check().finally(() => {
       this.registering = false;
       this.refresh(this.connected);
     });

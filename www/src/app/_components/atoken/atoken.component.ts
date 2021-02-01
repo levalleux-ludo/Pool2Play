@@ -1,8 +1,10 @@
 import { BigNumber } from 'bignumber.js';
 import { BlockchainService } from './../../_services/blockchain.service';
 import { AtokenContractService } from './../../_services/atoken-contract.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { connect } from 'http2';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 const ACCOUNTS = [
   '0x1b05Ba94aCc29d0D66a0114a0bC7Daa139153BE5',
@@ -18,7 +20,7 @@ const ACCOUNTS = [
   templateUrl: './atoken.component.html',
   styleUrls: ['./atoken.component.scss']
 })
-export class AtokenComponent implements OnInit {
+export class AtokenComponent implements OnInit, OnDestroy {
 
   connected = false;
   totalSupply;
@@ -32,13 +34,22 @@ export class AtokenComponent implements OnInit {
   buying = false;
   selling = false;
 
+  private unsubscribe$ = new Subject<void>();
+
   constructor(
     private aTokenContract: AtokenContractService,
     private blockchainService: BlockchainService
   ) { }
 
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+  }
+
   ngOnInit(): void {
-    this.aTokenContract.connected.subscribe((connected) => {
+    this.aTokenContract.connected
+    .pipe(takeUntil(this.unsubscribe$))
+    .subscribe((connected) => {
       this.refresh(connected);
     })
   }
@@ -53,13 +64,13 @@ export class AtokenComponent implements OnInit {
       this.totalSupply = await this.aTokenContract.totalSupply();
       this.accounts = [];
       let allAccounts = Array.from(ACCOUNTS);
-      if (!allAccounts.includes(this.blockchainService.status.account)) {
-        allAccounts.push(this.blockchainService.status.account);
+      if (!allAccounts.includes(this.blockchainService.status.account.toLowerCase())) {
+        allAccounts.push(this.blockchainService.status.account.toLowerCase());
       }
       for (let account of allAccounts) {
         this.aTokenContract.balanceOf(account).then((balance) => {
           this.accounts.push({address: account, balance});
-          if (account ===  this.blockchainService.status.account) {
+          if (account.toLowerCase() ===  this.blockchainService.status.account.toLowerCase()) {
             this.myBalance = balance;
           }
         })

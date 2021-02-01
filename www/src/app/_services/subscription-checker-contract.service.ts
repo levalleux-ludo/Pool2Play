@@ -14,8 +14,10 @@ export class SubscriptionCheckerContractService {
 
   address: string;
   contract: any;
+  subscriptions = [];
 
   connected = new BehaviorSubject<boolean>(false);
+  onCheck = new Subject<any>();
 
   constructor(
     @Inject(WEB3) private web3: Web3,
@@ -42,8 +44,27 @@ export class SubscriptionCheckerContractService {
   }
 
   async connect(address: string) {
+    if (this.contract) {
+      this.disconnect();
+    }
     this.contract = new this.web3.eth.Contract(subscriptionCheckerJSON.abi as any, address);
     this.address = address;
+    this.subscriptions.push(this.contract.events.Check({}, (error, event) => {
+      if (error) {
+        console.error(error);
+      } else {
+        console.log('SubscriptionChecker receives event Check', JSON.stringify(event));
+        const account = event.returnValues.account;
+        const forceTip = event.returnValues.forceTip;
+        const lastTimestamp = event.returnValues.lastTimestamp;
+        const didGet = event.returnValues.didGet;
+        const timestamp = event.returnValues.timestamp;
+        const subscriptionBalance = event.returnValues.subscriptionBalance;
+        const tipAdded = event.returnValues.tipAdded;
+        console.log('SubscriptionChecker receives event Check', account, forceTip, lastTimestamp.toString(), didGet, timestamp.toString(), subscriptionBalance.toString(), tipAdded);
+        this.onCheck.next({account, forceTip, lastTimestamp, didGet, timestamp, subscriptionBalance, tipAdded});
+      }
+    }));
     this.connected.next(true);
   }
 
@@ -51,6 +72,10 @@ export class SubscriptionCheckerContractService {
     this.connected.next(false);
     this.contract = undefined;
     this.address = undefined;
+    for(const subscription of this.subscriptions) {
+      subscription.unsubscribe();
+    }
+    this.subscriptions = [];
   }
 
   async subscribedToken(): Promise<string> {

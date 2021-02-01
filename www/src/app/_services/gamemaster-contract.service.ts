@@ -21,6 +21,7 @@ export const PlayerStatus = Object.keys(ePlayerStatus).map(key => ePlayerStatus[
 export class GameMasterContractService {
   address: string;
   contract: any;
+  subscriptions = [];
 
   connected = new BehaviorSubject<boolean>(false);
   myStatus = new BehaviorSubject<number | undefined>(undefined);
@@ -45,18 +46,22 @@ export class GameMasterContractService {
   }
 
   async connect(address: string) {
+    if (this.contract) {
+      this.disconnect();
+    }
     this.contract = new this.web3.eth.Contract(gameMasterJSON.abi as any, address);
     this.address = address;
-    this.contract.events.PlayerStatusChanged({}, (error, event) => {
+    this.subscriptions.push(this.contract.events.PlayerStatusChanged({}, (error, event) => {
       if (error) {
         console.error(error);
       } else {
         console.log('Game Master receive event', JSON.stringify(event));
-        if (event.returnValues.player === this.blockchainService.status.account) {
-          this.myStatus.next(event.returnValues.status);
+        if (event.returnValues.player.toLowerCase() === this.blockchainService.status.account.toLowerCase()) {
+          const newStatus = parseInt(event.returnValues.status.toString());
+          this.myStatus.next(ePlayerStatus[PlayerStatus[newStatus]]);
         }
       }
-    });
+    }));
     this.connected.next(true);
     const status = await this.playerStatus(this.blockchainService.status.account);
     this.myStatus.next(status);
@@ -66,6 +71,10 @@ export class GameMasterContractService {
     this.connected.next(false);
     this.contract = undefined;
     this.address = undefined;
+    for(const subscription of this.subscriptions) {
+      subscription.unsubscribe();
+    }
+    this.subscriptions = [];
   }
 
   public playerStatus(player: string): Promise<ePlayerStatus> {

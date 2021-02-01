@@ -8,4 +8,9 @@
     <button *ngIf="isPending" [disabled]="registering" (click)="register()">Update</button>
     <button *ngIf="isRegistered" [disabled]="registering" (click)="check()">Check</button>
     <div *ngIf="message">{{message}}</div>
+    <div>
+        <h2>Events</h2>
+        <div *ngFor="let event of events">{{event}}</div>
+    </div>
+
 </div>

@@ -14,6 +14,7 @@ export class TellorContractService {
 
   address: string;
   contract: any;
+  subscriptions = [];
 
   connected = new BehaviorSubject<boolean>(false);
 
@@ -46,9 +47,12 @@ export class TellorContractService {
   }
 
   async connect(address: string) {
+    if (this.contract) {
+      this.disconnect();
+    }
     this.contract = new this.web3.eth.Contract(tellorJSON.abi as any, address);
     this.address = address;
-    this.contract.events.TipAdded({}, (error, event) => {
+    this.subscriptions.push(this.contract.events.TipAdded({}, (error, event) => {
       if (error) {
         console.error(error);
       } else {
@@ -59,8 +63,8 @@ export class TellorContractService {
         console.log('Tellor receive event TipAdded', reqId.toString(), paramsHash, tip.toString());
         this.tipAdded.next({reqId, paramsHash, tip});
       }
-    });
-    this.contract.events.NewValue({}, (error, event) => {
+    }));
+    this.subscriptions.push(this.contract.events.NewValue({}, (error, event) => {
       if (error) {
         console.error(error);
       } else {
@@ -72,8 +76,8 @@ export class TellorContractService {
         console.log('Tellor receive event NewValue', reqId.toString(), paramsHash, time.toString(), value.toString());
         this.newValue.next({reqId, paramsHash, time, value});
       }
-    });
-    this.contract.events.Transfer({}, (error, event) => {
+    }));
+    this.subscriptions.push(this.contract.events.Transfer({}, (error, event) => {
       if (error) {
         console.error(error);
       } else {
@@ -82,9 +86,9 @@ export class TellorContractService {
         const recipient = event.returnValues.to;
         const amount = event.returnValues.value;
         console.log('Tellor receive event Transfer', sender, recipient, amount.toString());
-        this.newValue.next({sender, recipient, amount});
+        this.onTransfer.next({sender, recipient, amount});
       }
-    });
+    }));
     this.connected.next(true);
   }
 
@@ -92,6 +96,10 @@ export class TellorContractService {
     this.connected.next(false);
     this.contract = undefined;
     this.address = undefined;
+    for(const subscription of this.subscriptions) {
+      subscription.unsubscribe();
+    }
+    this.subscriptions = [];
   }
 
   public computeParamsHash(subscribedToken: string, account: string): string {
@@ -107,8 +115,20 @@ export class TellorContractService {
       return hash1;
   }
 
-  async getParams(paramsHash: string): Promise<any> {
-    return this.contract.methods.getParams(paramsHash).call();
+  async getParams(paramsHash: string): Promise<{subscribedToken: string, account: string}> {
+    return new Promise<{subscribedToken: string, account: string}>((resolve, reject) => {
+      this.contract.methods.getParams(paramsHash).call().then((params) => {
+        console.log("getParams", params);
+        const decoded = this.web3.eth.abi.decodeParameters(
+          ['address', 'address'],
+          params
+        );
+        const subscribedToken = decoded[0];
+        const account = decoded[1];
+        console.log('subscribedToken', subscribedToken, 'account', account);
+        resolve({subscribedToken, account});
+      }).catch(reject);
+    });
   }
 
   async submitValue(requestId: BigNumber, paramsHash: string, value: BigNumber) {

@@ -7,6 +7,8 @@ export class MinerController {
 
     constructor() {
         this._router.get('/balanceOf', this.balanceOf);
+        this._router.get('/', this.get_);
+
     }
 
     public get path() {
@@ -41,4 +43,8 @@ export class MinerController {
             return;
         }
     }
+    private get_ = (req: express.Request, res: express.Response) => {
+        res.send({Miner: 'OK'});
+    }
+
 }

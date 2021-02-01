@@ -28,6 +28,7 @@ import { MinerComponent } from './_components/miner/miner.component';
 import { GameMasterComponent } from './_components/gamemaster/gamemaster.component';
 import { TellorComponent } from './_components/tellor/tellor.component';
 import { SubscriptionCheckerComponent } from './_components/subscription-checker/subscription-checker.component';
+import { RegisteringComponent } from './_components/registering/registering.component';
 
 @NgModule({
   declarations: [
@@ -44,7 +45,8 @@ import { SubscriptionCheckerComponent } from './_components/subscription-checker
     MinerComponent,
     GameMasterComponent,
     TellorComponent,
-    SubscriptionCheckerComponent
+    SubscriptionCheckerComponent,
+    RegisteringComponent
   ],
   imports: [
     BrowserModule,

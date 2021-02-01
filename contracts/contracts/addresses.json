@@ -1,18 +1,18 @@
 {
     "aToken": {
-        "1337": "0xde5D87fE0eebb6C5723276abE753022C48A56736",
+        "1337": "0xe7b060FB2deF5EA245cAe1028b87dfbEf2E0A078",
         "31337": "0x5FbDB2315678afecb367f032d93F642f64180aa3"
     },
     "tellor": {
-        "1337": "0xe8FF7C12477130D63F2D516308F3134eb9489bB9",
+        "1337": "0x04AeF4B77293f40c18663DA4236ab1081cd4ccdF",
         "31337": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"
     },
     "subscriptionChecker": {
-        "1337": "0xF129ee2eAEe0a60e0695DCB5231A03f6fdaB1Da2",
+        "1337": "0x461D5899cbdc0AD1E518f9D19Ee630F33df2B7f7",
         "31337": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0"
     },
     "gameMaster": {
-        "1337": "0xDB3bF0Bee5c0DE37D6C65c61012aAfea2Ce469e1",
+        "1337": "0xDd94e7eFBd98BD90159b619eD0Ea4b59a2F2F354",
         "31337": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9"
     }
 }
