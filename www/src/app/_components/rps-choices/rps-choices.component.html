@@ -1,0 +1,20 @@
+<clr-radio-container clrInline>
+    <!-- <label>Inline radio example</label> -->
+
+    <clr-radio-wrapper class="radio" [ngClass]="{'selected': choice == Choices.Paper }">
+        <input type="radio" clrRadio name="options" required [value]="Choices.Paper" (change)="selectChoice($event.target.value)" />
+        <label>Paper<br><img src="assets/paper.png" height="60"></label>
+    </clr-radio-wrapper>
+
+    <clr-radio-wrapper class="radio" [ngClass]="{'selected': choice == Choices.Rock }">
+        <input type="radio" clrRadio name="options" required [value]="Choices.Rock" (change)="selectChoice($event.target.value)" />
+        <label>Rock<br><img src="assets/rock.png" height="60"></label>
+    </clr-radio-wrapper>
+
+    <clr-radio-wrapper class="radio" [ngClass]="{'selected': choice == Choices.Scissors }">
+        <input type="radio" clrRadio name="options" required [value]="Choices.Scissors" (change)="selectChoice($event.target.value)" />
+        <label>Scissors<br><img src="assets/scissors.png" height="60"></label>
+    </clr-radio-wrapper>
+    <!-- <clr-control-helper>Helper text</clr-control-helper>
+    <clr-control-error>This field is required!</clr-control-error> -->
+</clr-radio-container>

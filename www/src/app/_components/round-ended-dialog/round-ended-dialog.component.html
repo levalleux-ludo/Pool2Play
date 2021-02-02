@@ -1,0 +1,92 @@
+<div fxLayout="column">
+    <h1>Round #{{data.indexRound}}/{{data.nbRounds}} Ended</h1>
+    <!-- <div class="clr-row"> -->
+    <div fxLayout="row">
+        <!-- <div class="clr-col-lg-5 clr-col-md-8 clr-col-12"> -->
+        <div class="card" style="margin: 24px;">
+            <div class="card-header">
+                You
+            </div>
+            <div class="card-block">
+                <div class="card-title">
+                    {{Choices[data.choices[data.myIndex]]}}
+                </div>
+                <div class="card-text">
+                    <img src="{{Images[data.choices[data.myIndex]]}}" height="80">
+                </div>
+            </div>
+        </div>
+        <div class="card" style="margin: 24px;">
+            <div class="card-header">
+                Other Player
+            </div>
+            <div class="card-block">
+                <div class="card-title">
+                    {{Choices[data.choices[(data.myIndex + 1) % 2]]}}
+                </div>
+                <div class="card-text">
+                    <img src="{{Images[data.choices[(data.myIndex + 1) % 2]]}}" height="80">
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <div fxLayout="row">
+        <div>
+            <h2>You</h2>
+            <div>{{data.choices[data.myIndex]}}</div>
+        </div>
+        <div>
+            <h2>Other Player</h2>
+            <div>{{data.choices[(data.myIndex + 1) % 2]}}</div>
+        </div>
+    </div> -->
+    <div *ngIf="data.youwin">
+        <h3>Congratulations! You win this round</h3>
+    </div>
+    <div *ngIf="data.youlost">
+        <h3>Shame! You lost this round</h3>
+    </div>
+    <div *ngIf="!data.youwin && !data.youlost">
+        <h3>Equality!</h3>
+    </div>
+    <h1>Game Scores</h1>
+    <!-- <div fxLayout="row">
+        <div>
+            <h2>You</h2>
+            <div>{{data.scores[data.myIndex]}}</div>
+        </div>
+        <div>
+            <h2>Other Player</h2>
+            <div>{{data.scores[(data.myIndex + 1) % 2]}}</div>
+        </div>
+    </div> -->
+    <div fxLayout="row">
+        <!-- <div class="clr-row"> -->
+        <!-- <div class="clr-col-lg-5 clr-col-md-8 clr-col-12"> -->
+        <div class="card" style="margin: 24px;">
+            <div class="card-header">
+                You
+            </div>
+            <div class="card-block">
+                <div class="card-title">
+                    {{data.scores[data.myIndex]}}
+                </div>
+                <div class="card-text">
+                </div>
+            </div>
+        </div>
+        <div class="card" style="margin: 24px;">
+            <div class="card-header">
+                Other Player
+            </div>
+            <div class="card-block">
+                <div class="card-title">
+                    {{data.scores[(data.myIndex + 1) % 2]}}
+                </div>
+                <div class="card-text">
+                </div>
+            </div>
+        </div>
+        <!-- </div> -->
+    </div>
+</div>

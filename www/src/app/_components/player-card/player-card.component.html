@@ -1,0 +1,16 @@
+<div fxLayout="column">
+    <h4>{{title}}</h4>
+    <div fxLayout="row">
+        <div>address:</div>
+        <app-short-address [address]="player?.address"></app-short-address>
+    </div>
+    <h4>score:{{player?.score}}</h4>
+    <div fxLayout="row">
+        <div>committed:</div>
+        <div>{{player?.committed ? 'Yes' : 'No'}}</div>
+    </div>
+    <div fxLayout="row">
+        <div>revealed:</div>
+        <div>{{player?.revealed ? 'Yes' : 'No'}}</div>
+    </div>
+</div>

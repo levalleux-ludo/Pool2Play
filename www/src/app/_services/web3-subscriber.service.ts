@@ -45,11 +45,11 @@ export class Web3SubscriberService {
 
   public async addContract(name: string, address: string, abi: any) {
     console.log('Web3Subscriber: add contract', name, address);
-    if (!this.callbacksParContract.has(address)) {
-      this.callbacksParContract.set(address, []);
+    if (!this.callbacksParContract.has(address.toLowerCase())) {
+      this.callbacksParContract.set(address.toLowerCase(), []);
     }
-    if (!this.contractsName.has(address)) {
-      this.contractsName.set(address, name);
+    if (!this.contractsName.has(address.toLowerCase())) {
+      this.contractsName.set(address.toLowerCase(), name);
     }
     const eventsEntry = new Map<string, string>();
     for (const entry of abi) {
@@ -59,12 +59,12 @@ export class Web3SubscriberService {
         eventsEntry.set(hash, entry);
       }
     }
-    this.contractsEvents.set(address, eventsEntry);
+    this.contractsEvents.set(address.toLowerCase(), eventsEntry);
     await this.refreshFilter();
   }
 
   public addSubscription(contract: string, callback: Callback): Subscription {
-    const callbacks = this.callbacksParContract.get(contract)
+    const callbacks = this.callbacksParContract.get(contract.toLowerCase())
     if (!callbacks) {
       throw new Error('Contract unknown from subscriberService:' + contract);
     }
@@ -100,7 +100,7 @@ export class Web3SubscriberService {
         console.log('Web3Subscriber: subscribe to logs with filter', contractsFilter);
         this.subscription = this.web3.eth.subscribe('logs', {address: contractsFilter}, (error, result) => {
           if (!error) {
-            console.log('event from contract', this.contractsName.get(result.address));
+            console.log('event from contract', this.contractsName.get(result.address.toLowerCase()));
             console.log('transactionHash', result.transactionHash);
             console.log('topics', result.topics);
             const eventKey = result.transactionHash + result.topics[0];
@@ -111,14 +111,14 @@ export class Web3SubscriberService {
             this.eventsTxHashes.set(eventKey, eventKey);
             console.log('data', result.data);
             const eventHash = result.topics[0];
-            const eventEntry = this.contractsEvents.get(result.address).get(eventHash);
+            const eventEntry = this.contractsEvents.get(result.address.toLowerCase()).get(eventHash);
             if (!eventEntry) {
                 console.error('cannot find event from hash ' + eventHash);
             } else {
                 console.log(eventEntry);
                 const decodedLog = this.web3.eth.abi.decodeLog((eventEntry as any).inputs, result.data, result.topics.slice(1));
                 console.log('event', (eventEntry as any).name, 'decodedLog', decodedLog);
-                const callbacks = this.callbacksParContract.get(result.address);
+                const callbacks = this.callbacksParContract.get(result.address.toLowerCase());
                 for(const callback of callbacks) {
                   callback({name: (eventEntry as any).name, returnValues: decodedLog});
                 }

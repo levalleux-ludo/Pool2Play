@@ -14,12 +14,12 @@ export interface INetwork {
 }
 
 const NETWORKS = {
-    // one: 'ganache',
+    one: 'ganache',
     // one: 'goerli',
-    one: 'bscTest',
-    // two: 'ganache'
-    two: 'mumbai'
-    // two: 'bscTest'
+    // one: 'bscTest',
+    two: 'ganache',
+    // two: 'mumbai',
+    // two: 'bscTest',
 }
 
 function getBalanceAsNumber(

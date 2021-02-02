@@ -2,15 +2,22 @@
 <div *ngIf="!connected">Not connected</div>
 <div *ngIf="connected">
     <!-- <button (click)="refresh(connected)">Refresh</button> -->
-    <div>address: {{address}}</div>
+    <div>address:
+        <app-short-address [address]="address"></app-short-address>
+    </div>
     <div>My Status: {{statusText}}</div>
-    <button *ngIf="!isRegistered && !isPending" [disabled]="registering" (click)="register()">Register</button>
-    <button *ngIf="isPending" [disabled]="registering" (click)="register()">Update</button>
-    <button *ngIf="isRegistered" [disabled]="registering" (click)="check()">Check</button>
+    <button class="btn btn-primary" *ngIf="!isPending" [disabled]="registering" (click)="register()">Register</button>
+    <button class="btn btn-primary" *ngIf="isPending" [disabled]="registering" (click)="register()">Update</button>
+    <button class="btn btn-primary" *ngIf="isRegistered" [disabled]="registering" (click)="check()">Check</button>
     <div *ngIf="message">{{message}}</div>
     <div>
         <h2>Events</h2>
         <div *ngFor="let event of events">{{event}}</div>
     </div>
-
+    <div>
+        <h2>"Rock Paper Scissors" Games</h2>
+        <div *ngFor="let game of rpsGames">
+            <app-rps-game-item [address]="game"></app-rps-game-item>
+        </div>
+    </div>
 </div>

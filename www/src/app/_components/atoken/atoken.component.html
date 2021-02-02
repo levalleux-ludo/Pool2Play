@@ -1,8 +1,10 @@
 <h1>aToken Contract</h1>
 <div *ngIf="!connected">Not connected</div>
 <div *ngIf="connected">
-    <button (click)="refresh(connected)">Refresh</button>
-    <div>address: {{address}}</div>
+    <button class="btn btn-primary" (click)="refresh(connected)">Refresh</button>
+    <div>address:
+        <app-short-address [address]="address"></app-short-address>
+    </div>
     <div>name: {{name}}</div>
     <div>symbol: {{symbol}}</div>
     <div>decimals: {{decimals}}</div>
@@ -21,26 +23,28 @@
         </tr>
 
         <tr *ngFor="let account of accounts">
-            <td>{{account.address}}</td>
+            <td>
+                <app-short-address [address]="account.address"></app-short-address>
+            </td>
             <td>
                 <app-balance [balance]="account.balance" [decimals]="decimals" [symbol]="symbol"></app-balance>
             </td>
         </tr>
     </table>
     <div>
-        <button [disabled]="waiting" (click)="buying = true">Buy</button>
-        <button [disabled]="(myBalance == undefined) || (myBalance.comparedTo(0) <= 0) || waiting" (click)="selling = true">Sell</button>
+        <button class="btn btn-primary" [disabled]="waiting" (click)="buying = true">Buy</button>
+        <button class="btn btn-primary" [disabled]="(myBalance == undefined) || (myBalance.comparedTo(0) <= 0) || waiting" (click)="selling = true">Sell</button>
     </div>
 </div>
 <div *ngIf="selling">
     <input #amount type="number" [value]=0 min=0 max={{getMaxToSale()}}>
-    <button [disabled]="amount.value == 0 || waiting" (click)="sell(amount.value)">Apply</button>
-    <button [disabled]="waiting" (click)="selling = false">Cancel</button>
+    <button class="btn btn-primary" [disabled]="amount.value == 0 || waiting" (click)="sell(amount.value)">Apply</button>
+    <button class="btn btn-primary" [disabled]="waiting" (click)="selling = false">Cancel</button>
     <mat-progress-bar *ngIf="waiting" mode="indeterminate"></mat-progress-bar>
 </div>
 <div *ngIf="buying">
     <input #amount type="number" [value]=0 min=0>
-    <button [disabled]="amount.value == 0 || waiting" (click)="buy(amount.value)">Apply</button>
-    <button [disabled]="waiting" (click)="buying = false">Cancel</button>
+    <button class="btn btn-primary" [disabled]="amount.value == 0 || waiting" (click)="buy(amount.value)">Apply</button>
+    <button class="btn btn-primary" [disabled]="waiting" (click)="buying = false">Cancel</button>
     <mat-progress-bar *ngIf="waiting" mode="indeterminate"></mat-progress-bar>
 </div>

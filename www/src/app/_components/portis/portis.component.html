@@ -1,8 +1,8 @@
 <div *ngIf="!status.connected">
-    <button [disabled]="status.connecting" (click)="connect()">Connect with Portis</button>
+    <button class="btn btn-primary" [disabled]="status.connecting" (click)="connect()">Connect with Portis</button>
 </div>
 <div *ngIf="status.connected">
     <!-- <div>Account: {{status.account}}</div>
     <div>Chain: {{chainId}}</div> -->
-    <button [disabled]="status.connecting" (click)="disconnect()">Disconnect</button>
+    <button class="btn btn-primary" [disabled]="status.connecting" (click)="disconnect()">Disconnect</button>
 </div>

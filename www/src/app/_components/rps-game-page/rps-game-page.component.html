@@ -1,0 +1,40 @@
+<app-three></app-three>
+<h1>Rock Paper Scissors</h1>
+<div fxLayout="column">
+    <h3>Contract Address:
+        <app-short-address [address]="address"></app-short-address>
+    </h3>
+    <h3>Game Status:{{translateStatus(status)}} </h3>
+    <h3>{{players.length}} player(s)</h3>
+    <div *ngIf="myIndex != undefined">
+        <div fxLayout="row">
+            <app-player-card [player]="players[myIndex]" [title]="'You'"></app-player-card>
+            <app-player-card *ngIf="players[(myIndex + 1) % 2]" [player]="players[(myIndex + 1) % 2]" [title]="'Other Player'"></app-player-card>
+        </div>
+        <div *ngIf="(status == INITIALIZED)">
+            <h2>Waiting for another player to join the game...</h2>
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        </div>
+        <div *ngIf="(status != INITIALIZED)">
+            <h2>Round #{{nbRounds + 1 - remainingRounds}}/{{nbRounds}}</h2>
+            <div *ngIf="!players[myIndex].committed && (status == READY)">
+                <h2>Choose Your Weapon:</h2>
+                <app-rps-choices (select)="choice = $event"></app-rps-choices>
+                <button class="btn btn-primary" [disabled]="(choice == undefined) || committing" (click)="commit()">Commit</button>
+            </div>
+            <div *ngIf="players[myIndex].committed && (status == READY)">
+                <h2>Waiting for the other player have committed...</h2>
+                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+            </div>
+            <div *ngIf="!players[myIndex].revealed && (status == COMMITTED)">
+                <h2>Alea Jacta Est !</h2>
+                <p>Both players have committed, please now reveal.</p>
+                <button class="btn btn-primary" [disabled]="revealing" (click)="reveal()">Reveal</button>
+            </div>
+            <div *ngIf="players[myIndex].revealed && (status == COMMITTED)">
+                <h2>Waiting for the other player have revealed...</h2>
+                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+            </div>
+        </div>
+    </div>
+</div>

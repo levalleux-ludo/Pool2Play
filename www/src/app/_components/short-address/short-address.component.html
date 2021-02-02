@@ -1,0 +1,4 @@
+<span [matMenuTriggerFor]="menu">{{shortAddress(address)}}</span>
+<mat-menu #menu="matMenu">
+    <span mat-menu-item [matTooltip]="'copy to clipboard'" [cdkCopyToClipboard]="address">{{address}}</span>
+</mat-menu>

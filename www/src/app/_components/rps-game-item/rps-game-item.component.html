@@ -1,0 +1,11 @@
+@<span><app-short-address [address]="address"></app-short-address> </span>
+<span>{{translateStatus(status)}} </span>
+<span>{{players.length}} player(s)</span>
+<span *ngIf="players.length == 0">no player</span>
+<span *ngIf="players.length == 1">1 player</span>
+<span *ngIf="players.length == 2">2 players</span>
+<span *ngFor="let player of players">
+  <span *ngIf="player.address == account">
+    <a [routerLink]="['/game']" [queryParams]="{address: address}">Join</a>
+  </span>
+</span>

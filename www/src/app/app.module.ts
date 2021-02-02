@@ -10,6 +10,11 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ClarityModule } from '@clr/angular';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
+import {MatDialogModule} from '@angular/material/dialog';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {MatMenuModule} from '@angular/material/menu';
+import {ClipboardModule} from '@angular/cdk/clipboard';
+import {MatButtonModule} from '@angular/material/button';
 
 
 
@@ -29,6 +34,12 @@ import { GameMasterComponent } from './_components/gamemaster/gamemaster.compone
 import { TellorComponent } from './_components/tellor/tellor.component';
 import { SubscriptionCheckerComponent } from './_components/subscription-checker/subscription-checker.component';
 import { RegisteringComponent } from './_components/registering/registering.component';
+import { RpsGameItemComponent } from './_components/rps-game-item/rps-game-item.component';
+import { RpsGamePageComponent } from './_components/rps-game-page/rps-game-page.component';
+import { PlayerCardComponent } from './_components/player-card/player-card.component';
+import { RpsChoicesComponent } from './_components/rps-choices/rps-choices.component';
+import { RoundEndedDialogComponent } from './_components/round-ended-dialog/round-ended-dialog.component';
+import { ShortAddressComponent } from './_components/short-address/short-address.component';
 
 @NgModule({
   declarations: [
@@ -46,7 +57,13 @@ import { RegisteringComponent } from './_components/registering/registering.comp
     GameMasterComponent,
     TellorComponent,
     SubscriptionCheckerComponent,
-    RegisteringComponent
+    RegisteringComponent,
+    RpsGameItemComponent,
+    RpsGamePageComponent,
+    PlayerCardComponent,
+    RpsChoicesComponent,
+    RoundEndedDialogComponent,
+    ShortAddressComponent
   ],
   imports: [
     BrowserModule,
@@ -54,7 +71,12 @@ import { RegisteringComponent } from './_components/registering/registering.comp
     BrowserAnimationsModule,
     ClarityModule,
     FlexLayoutModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    MatDialogModule,
+    MatTooltipModule,
+    MatMenuModule,
+    ClipboardModule,
+    MatButtonModule
   ],
   providers: [
     WindowRef,

@@ -9,6 +9,7 @@ contract RockPaperScissors is Ownable {
     enum eChoice { Rock, Paper, Scissors }
     enum eGameStatus { Initialized, Ready, Committed, RoundEnded }
     
+    event onPlayerRegistered(address player, uint8 index);
     event onStatusChanged(eGameStatus newStatus);
     event onGameEnded(uint8[2] scores);
     event onRoundEnded(eChoice[2] choices, address winner, uint8[2] scores);
@@ -57,11 +58,13 @@ contract RockPaperScissors is Ownable {
         if (players[0] == address(0)) {
             players[0] = player;
             playerIndex[player] = 0;
+            emit onPlayerRegistered(player, 0);
         } else if (players[0] == player) {
             revert("RockPaperScissors: ALREADY REGISTERED");
         } else if (players[1] == address(0)) {
             players[1] = player;
             playerIndex[player] = 1;
+            emit onPlayerRegistered(player, 1);
             goReady();
         } else if (players[1] == player) {
             revert("RockPaperScissors: ALREADY REGISTERED");
@@ -158,7 +161,7 @@ contract RockPaperScissors is Ownable {
     function goRoundEnded() internal inStatus(eGameStatus.Committed) {
         require(checkRevealed(), "RockPaperScissors: REVEALED NOT COMPLETED");
         status = eGameStatus.RoundEnded;
-        emit onStatusChanged(status);
+        // emit onStatusChanged(status); // do not emit this event because we dont stay in this status
         computeScores();
         remainingRounds--;
         if (remainingRounds > 0) {

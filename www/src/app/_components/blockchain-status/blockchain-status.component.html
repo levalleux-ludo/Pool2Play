@@ -5,6 +5,7 @@
 </div>
 <div *ngIf="status.connected && !status.connecting">
     Connected to {{status.network}}
-    <span>Account: {{status.account}} </span>
+
+    <span>Account: <app-short-address [address]="status.account"></app-short-address> </span>
     <span>Balance: {{balance}} </span>
 </div>

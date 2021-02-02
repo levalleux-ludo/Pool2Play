@@ -1,4 +1,5 @@
-import { BehaviorSubject } from 'rxjs';
+import { RSPGame } from './rpsGame';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { BlockchainService } from './blockchain.service';
 import { Inject, Injectable } from '@angular/core';
 import Web3 from 'web3';
@@ -27,6 +28,7 @@ export class GameMasterContractService {
 
   connected = new BehaviorSubject<boolean>(false);
   myStatus = new BehaviorSubject<number | undefined>(undefined);
+  onRegistered = new Subject<void>();
 
   constructor(
     @Inject(WEB3) private web3: Web3,
@@ -68,6 +70,11 @@ export class GameMasterContractService {
           }
           break;
         }
+        case 'OnRegistered': {
+          console.log('GameMaster receive event OnRegistered', JSON.stringify(event));
+          this.onRegistered.next();
+          break;
+        }
         default: {
           console.log('GameMaster: ignore event', event.name);
           break;
@@ -90,6 +97,21 @@ export class GameMasterContractService {
     this.myStatus.next(status);
   }
 
+  getGames(): Promise<string[]> {
+    return new Promise<any[]>(async (resolve, reject) => {
+      const games = []
+      const nbGames = await (await this.getNbGames()).toNumber();
+      for (let i = 0; i < nbGames; i++) {
+        const gameAddress = await this.getGameAt(new BigNumber(i));
+        // const rpsGame = new RSPGame(this.web3, this.blockchainService, this.subscriberService);
+        // await rpsGame.connect(gameAddress)
+        // games.push(rpsGame);
+        games.push(gameAddress)
+      }
+      resolve(games);
+    });
+  }
+
   disconnect() {
     if (this.subscription) {
       this.subscription.unsubscribe();
@@ -102,7 +124,7 @@ export class GameMasterContractService {
       subscription.unsubscribe(function(error, success){
         if(success)
             console.log('Successfully unsubscribed!');
-    });
+      });
     }
     this.subscriptions = [];
   }
@@ -113,6 +135,18 @@ export class GameMasterContractService {
         resolve(ePlayerStatus[PlayerStatus[+playerStatus]]);
       }).catch(reject);
     });
+  }
+
+  public getNbGames(): Promise<BigNumber> {
+    return new Promise<BigNumber>((resolve, reject) => {
+      this.contract.methods.getNbGames().call().then((nbGames) => {
+        resolve(new BigNumber(nbGames));
+      }).catch(reject);
+    });
+  }
+
+  public getGameAt(index: BigNumber): Promise<string> {
+    return this.contract.methods.getGameAt(index).call();
   }
 
   public async register() {

@@ -4,6 +4,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { BlockchainService } from 'src/app/_services/blockchain.service';
+import BigNumber from 'bignumber.js';
 
 @Component({
   selector: 'app-gamemaster',
@@ -22,6 +23,7 @@ export class GameMasterComponent implements OnInit, OnDestroy {
   isPending = false;
   events = [];
   message;
+  rpsGames = [];
   set status(value: ePlayerStatus) {
     this.statusText = PlayerStatus[value];
     this.isRegistered = value === ePlayerStatus.Registered;
@@ -62,6 +64,15 @@ export class GameMasterComponent implements OnInit, OnDestroy {
         this.registering = false;
       }
     })
+    this.gameMasterContract.onRegistered
+    .pipe(takeUntil(this.unsubscribe$))
+    .subscribe(() => {
+      this.refreshGames();
+    })
+  }
+
+  async refreshGames() {
+     this.rpsGames = await this.gameMasterContract.getGames();
   }
 
   async refresh(connected: boolean) {
@@ -69,6 +80,7 @@ export class GameMasterComponent implements OnInit, OnDestroy {
     if (connected) {
       this.address = this.gameMasterContract.address;
       this.status = await this.gameMasterContract.playerStatus(this.blockchainService.status.account);
+      this.refreshGames();
     } else {
       this.address = undefined;
     }
