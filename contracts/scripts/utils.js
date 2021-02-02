@@ -29,6 +29,19 @@ async function deployContractsB1(args = undefined) {
 
 }
 
+async function deployRPS(args = undefined) {
+    let params;
+    params = [];
+    if (args && args.rockPaperScissors) {
+        params = args.rockPaperScissors;
+    }
+    const RockPaperScissors = await hre.ethers.getContractFactory("RockPaperScissors");
+    const rockPaperScissors = await RockPaperScissors.deploy(...params);
+    await rockPaperScissors.deployed();
+
+    return { rockPaperScissors };
+}
+
 async function deployContracts(args = undefined) {
     const { aToken } = await deployContractsB1(args);
     // add aToken.address in first position of subscriptionChecker args
@@ -81,5 +94,6 @@ module.exports = {
     deployContracts,
     deployContractsB1,
     deployContractsB2,
-    computeParamsHash
+    computeParamsHash,
+    deployRPS
 }

@@ -6,6 +6,8 @@
     "scripts": {
         "build": "hardhat compile",
         "test": "hardhat test",
+        "test:RPS": "hardhat test test/rockPaperScissors-test.js",
+        "test:GM": "hardhat test test/gameMaster-test.js",
         "deploy:b1": "hardhat run scripts/deploy-b1.js",
         "deploy:b2": "hardhat run scripts/deploy-b2.js",
         "faucet:ganache": "hardhat run scripts/ganache_faucet.js --network ganache"
