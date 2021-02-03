@@ -2,9 +2,10 @@
     "name": "www",
     "version": "0.0.0",
     "scripts": {
+        "postinstall": "cd ../contracts && npm install && npm run build && cd ../www",
         "ng": "ng",
         "start": "ng serve",
-        "build": "ng build",
+        "build": "ng build --prod",
         "test": "ng test",
         "lint": "ng lint",
         "e2e": "ng e2e"

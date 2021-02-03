@@ -11,6 +11,9 @@ RUN adduser \
 
 USER p2pMiner
 RUN mkdir -p /home/p2pMiner/api
+RUN mkdir -p /home/p2pMiner/contracts
+COPY --chown=p2pMiner lib/contracts/artifacts /home/p2pMiner/contracts/artifacts
+COPY --chown=p2pMiner lib/contracts/contracts /home/p2pMiner/contracts/contracts
 WORKDIR /home/p2pMiner/api
 COPY --chown=p2pMiner package*.json ./
 COPY --chown=p2pMiner scripts scripts

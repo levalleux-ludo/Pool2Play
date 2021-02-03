@@ -1,0 +1,21 @@
+{
+    "name": "PoolToPlay",
+    "version": "1.0.0",
+    "description": "**Pool2Play** is a concept for decentralized game allowing to accept players only when they have staked to a subscription pool.",
+    "main": "index.js",
+    "scripts": {
+        "postinstall": "cd www && npm install",
+        "build:www": "cd www && npm run build"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/levalleux-ludo/Pool2Play.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/levalleux-ludo/Pool2Play/issues"
+    },
+    "homepage": "https://github.com/levalleux-ludo/Pool2Play#readme"
+}

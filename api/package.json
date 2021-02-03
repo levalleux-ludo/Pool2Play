@@ -10,7 +10,8 @@
         "start": "npm run build && npx node -r ts-node/register ./src/index.ts --unhandled-rejections=strict",
         "test": "mocha -r ts-node/register  --watch-extensions ts --watch --watch-files src  tests/**/*.test.ts",
         "docker:build": "npm run build && docker-compose build",
-        "docker:run": "docker-compose up & docker-compose down",
+        "docker:run": "docker-compose up --abort-on-container-exit ",
+        "postdocker:run": "docker-compose down",
         "docker:push": "docker-compose push"
     },
     "keywords": [],
