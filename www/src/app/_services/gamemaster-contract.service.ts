@@ -116,9 +116,11 @@ export class GameMasterContractService {
     if (this.subscription) {
       this.subscription.unsubscribe();
     }
-    this.connected.next(false);
-    this.contract = undefined;
-    this.address = undefined;
+    if (this.contract !== undefined) {
+      this.connected.next(false);
+      this.contract = undefined;
+      this.address = undefined;
+    }
     for(const subscription of this.subscriptions) {
       console.log('unsubscribe from contract event', subscription);
       subscription.unsubscribe(function(error, success){

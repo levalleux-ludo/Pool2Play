@@ -10,14 +10,15 @@ import { Routes, RouterModule } from '@angular/router';
 
 
 const routes: Routes = [
-  { path: '1', component: OneComponent, data: { network: 'ganache'}  },
-  // { path: '1', component: OneComponent, data: { network: 'goerli'}  },
+  // { path: '1', component: OneComponent, data: { network: 'ganache'}  },
+  { path: '1', component: OneComponent, data: { network: 'goerli'}  },
   // { path: '1', component: OneComponent, data: { network: 'bscTest'}  },
-  { path: '2', component: TwoComponent, data: { network: 'ganache'} },
+  // { path: '2', component: TwoComponent, data: { network: 'ganache'} },
   // { path: '2', component: TwoComponent, data: { network: 'maticMumbai'} },
-  // { path: '2', component: TwoComponent, data: { network: 'bscTest'} },
+  { path: '2', component: TwoComponent, data: { network: 'bscTest'} },
   { path: 'miner', component: MinerComponent },
-  { path: 'game', component: RpsGamePageComponent, data: { network: 'ganache'} },
+  // { path: 'game', component: RpsGamePageComponent, data: { network: 'ganache'} },
+  { path: 'game', component: RpsGamePageComponent, data: { network: 'bscTest'} },
   // { path: '3', component: ThreeComponent, data: { network: 'goerli'}  },
   // { path: '4', component: ThreeComponent, data: { network: 'matic'} },
   { path: '**', redirectTo: '/1' },

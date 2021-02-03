@@ -70,6 +70,7 @@ export class BlockchainService {
       clearInterval(this.interval);
       this.interval = undefined;
     }
+    this.accountBalance.next(undefined);
   }
 
   disconnected() {

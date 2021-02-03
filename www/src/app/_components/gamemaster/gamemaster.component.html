@@ -1,4 +1,8 @@
-<h1>GameMaster Contract</h1>
+<header class="header-3">
+    <div class="branding">
+        <span class="title">GameMaster Contract</span>
+    </div>
+</header>
 <div *ngIf="!connected">Not connected</div>
 <div *ngIf="connected">
     <!-- <button (click)="refresh(connected)">Refresh</button> -->
@@ -11,13 +15,28 @@
     <button class="btn btn-primary" *ngIf="isRegistered" [disabled]="registering" (click)="check()">Check</button>
     <div *ngIf="message">{{message}}</div>
     <div>
-        <h2>Events</h2>
-        <div *ngFor="let event of events">{{event}}</div>
+        <clr-datagrid>
+            <clr-dg-column>Events</clr-dg-column>
+            <clr-dg-row *ngFor="let event of events">
+                <clr-dg-cell>
+                    <span>{{event}}</span>
+                </clr-dg-cell>
+            </clr-dg-row>
+        </clr-datagrid>
     </div>
     <div>
-        <h2>"Rock Paper Scissors" Games</h2>
+        <!-- <h2>"Rock Paper Scissors" Games</h2>
         <div *ngFor="let game of rpsGames">
             <app-rps-game-item [address]="game"></app-rps-game-item>
-        </div>
+        </div> -->
+        <clr-datagrid>
+            <clr-dg-column>"Rock Paper Scissors" Games</clr-dg-column>
+            <clr-dg-row *ngFor="let game of rpsGames">
+                <clr-dg-cell>
+                    <app-rps-game-item [address]="game"></app-rps-game-item>
+                </clr-dg-cell>
+            </clr-dg-row>
+        </clr-datagrid>
+
     </div>
 </div>

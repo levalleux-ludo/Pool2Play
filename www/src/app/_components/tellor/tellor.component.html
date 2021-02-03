@@ -1,16 +1,47 @@
-<h1>Tellor Contract</h1>
+<header class="header-5">
+    <div class="branding">
+        <span class="title">Tellor Contract</span>
+    </div>
+</header>
 <div *ngIf="!connected">Not connected</div>
 <div *ngIf="connected">
-    <div>address:
-        <app-short-address [address]="address"></app-short-address>
-    </div>
-    <div>requestId: {{requestId}}</div>
-    <div>SubscriptionChecker balance:
-        <app-balance [balance]="subscriptionCheckerBalance" [decimals]="decimals" [symbol]="symbol"></app-balance>
+    <div style="width: 350px;">
+        <clr-datagrid>
+            <clr-dg-row>
+                <clr-dg-cell>
+                    <span>address</span>
+                </clr-dg-cell>
+                <clr-dg-cell>
+                    <app-short-address [address]="address"></app-short-address>
+                </clr-dg-cell>
+            </clr-dg-row>
+            <clr-dg-row>
+                <clr-dg-cell>
+                    <span>requestId</span>
+                </clr-dg-cell>
+                <clr-dg-cell>
+                    <span>{{requestId}}</span>
+                </clr-dg-cell>
+            </clr-dg-row>
+            <clr-dg-row>
+                <clr-dg-cell>
+                    <span>SubscriptionChecker balance</span>
+                </clr-dg-cell>
+                <clr-dg-cell>
+                    <app-balance [balance]="subscriptionCheckerBalance" [decimals]="decimals" [symbol]="symbol"></app-balance>
+                </clr-dg-cell>
+            </clr-dg-row>
+        </clr-datagrid>
     </div>
     <div>
-        <h2>Events</h2>
-        <div *ngFor="let event of events">{{event}}</div>
+        <clr-datagrid>
+            <clr-dg-column>Events</clr-dg-column>
+            <clr-dg-row *ngFor="let event of events">
+                <clr-dg-cell>
+                    <span>{{event}}</span>
+                </clr-dg-cell>
+            </clr-dg-row>
+        </clr-datagrid>
     </div>
     <button class="btn btn-primary" [disabled]="waiting" (click)="submittingValue = true">SubmitValue</button>
     <div *ngIf="submittingValue">

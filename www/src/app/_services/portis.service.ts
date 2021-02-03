@@ -32,10 +32,10 @@ export class PortisService {
 
   async login(network: any): Promise<{account: string, provider: any}> {
     return new Promise<{account: string, provider: any}>(async (resolve, reject) => {
-      this.blockchainService.connecting(network);
       try {
         const ready = await this.isReady();
         if (!ready) {
+          this.blockchainService.connecting(network);
           this.portis = new Portis(PORTIS_API_KEY, (environment.other_networks[network]) ? environment.other_networks[network] : network);
           this.chainId = this.portis.config.network.chainId;
           this.network = network;
@@ -49,7 +49,10 @@ export class PortisService {
             resolve({account: walletAddress, provider: this.portis.provider});
           });
         } else if (network !== this.network) {
+          this.blockchainService.disconnecting();
+          this.blockchainService.disconnected();
           this.portis.changeNetwork((environment.other_networks[network]) ? environment.other_networks[network] : network);
+          this.blockchainService.connecting(network);
           this.chainId = this.portis.config.network.chainId;
           this.network = network;
           this.web3.setProvider(this.portis.provider as any);

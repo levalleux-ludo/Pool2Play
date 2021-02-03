@@ -99,9 +99,11 @@ export class SubscriptionCheckerContractService {
     if (this.subscription) {
       this.subscription.unsubscribe();
     }
-    this.connected.next(false);
-    this.contract = undefined;
-    this.address = undefined;
+    if (this.contract !== undefined) {
+      this.connected.next(false);
+      this.contract = undefined;
+      this.address = undefined;
+    }
     for(const subscription of this.subscriptions) {
       subscription.unsubscribe(function(error, success){
         if(success)

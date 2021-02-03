@@ -1,8 +1,9 @@
 import { BlockchainService, ConnectionStatus } from './../../_services/blockchain.service';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { PortisService } from 'src/app/_services/portis.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-portis',
@@ -13,7 +14,9 @@ export class PortisComponent implements OnInit, OnDestroy {
 
   private unsubscribe$ = new Subject<void>();
 
-  // @Input()
+  @Input()
+  height = 60;
+  image;
   latestNetwork: any;
   // connecting = false;
   // connected = false;
@@ -41,6 +44,12 @@ export class PortisComponent implements OnInit, OnDestroy {
       if (this.status.network) {
         this.latestNetwork = this.status.network;
       }
+      if (status.connected) {
+        this.image = environment.images['portis'];
+      } else {
+        this.image = undefined;
+      }
+
     })
     // this.portis.isReady().then((ready) => {
     //   this.connected = ready;

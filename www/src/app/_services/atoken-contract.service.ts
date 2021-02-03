@@ -44,9 +44,11 @@ export class AtokenContractService {
   }
 
   disconnect() {
-    this.connected.next(false);
-    this.contract = undefined;
-    this.address = undefined;
+    if (this.contract !== undefined) {
+      this.connected.next(false);
+      this.contract = undefined;
+      this.address = undefined;
+    }
   }
 
   public totalSupply(): Promise<BigNumber> {
@@ -85,7 +87,7 @@ export class AtokenContractService {
     return new Promise<void>(async (resolve, reject) => {
       const price = await this.computePrice(amount);
       console.log("Buying price", price.toString());
-      this.contract.methods.buy(amount).send({from: this.blockchainService.status.account, value: price})
+      this.contract.methods.buy(amount).send({from: this.blockchainService.status.account, value: price, gasPrice:3000000000})
       .once('receipt', receipt => {
         console.log(receipt);
       })
@@ -106,7 +108,7 @@ export class AtokenContractService {
 
   public async sell(amount: BigNumber) {
     return new Promise<void>(async (resolve, reject) => {
-      this.contract.methods.sell(amount).send({from: this.blockchainService.status.account})
+      this.contract.methods.sell(amount).send({from: this.blockchainService.status.account, gasPrice:3000000000})
       .once('receipt', receipt => {
         console.log(receipt);
       })

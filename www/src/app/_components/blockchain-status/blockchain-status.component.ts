@@ -1,6 +1,7 @@
+import { environment } from './../../../environments/environment';
 import { BigNumber } from 'bignumber.js';
 import { BlockchainService, ConnectionStatus } from './../../_services/blockchain.service';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -13,6 +14,10 @@ export class BlockchainStatusComponent implements OnInit, OnDestroy {
 
   status: ConnectionStatus;
   balance;
+  image;
+  @Input()
+  height = 60;
+  nativeSymbol;
 
   private unsubscribe$ = new Subject<void>();
 
@@ -31,12 +36,23 @@ export class BlockchainStatusComponent implements OnInit, OnDestroy {
     .pipe(takeUntil(this.unsubscribe$))
     .subscribe((status: any) => {
       this.status = status;
+      if (status.connected) {
+        this.image = environment.images[status.network];
+        this.nativeSymbol = environment.nativeSymbol[status.network];
+      } else {
+        this.image = undefined;
+        this.nativeSymbol = undefined;
+      }
     })
     this.blockchainService.accountBalance
     .pipe(takeUntil(this.unsubscribe$))
     .subscribe((balance) => {
       // this.balance = balance.toString();
-      this.balance = balance.div(new BigNumber(10).pow(18)).toString();
+      if (balance !== undefined) {
+        this.balance = balance.div(new BigNumber(10).pow(18)).toString().substr(0, 8);
+      } else {
+        this.balance = '-';
+      }
     })
   }
 

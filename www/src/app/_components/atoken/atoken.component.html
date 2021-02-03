@@ -1,21 +1,117 @@
-<h1>aToken Contract</h1>
+<header class="header-1">
+    <div class="branding">
+        <span class="title">aToken Contract</span>
+    </div>
+</header>
 <div *ngIf="!connected">Not connected</div>
 <div *ngIf="connected">
     <button class="btn btn-primary" (click)="refresh(connected)">Refresh</button>
-    <div>address:
+    <!-- <div>address:
         <app-short-address [address]="address"></app-short-address>
-    </div>
-    <div>name: {{name}}</div>
+    </div> -->
+    <!-- <div>name: {{name}}</div>
     <div>symbol: {{symbol}}</div>
     <div>decimals: {{decimals}}</div>
     <div>totalSupply:
         <app-balance [decimals]="decimals" [balance]="totalSupply" [symbol]="symbol"></app-balance>
-    </div>
-    <div>My {{name}} Balance:
-        <app-balance [decimals]="decimals" [balance]="myBalance" [symbol]="symbol"></app-balance>
+    </div> -->
+    <div style="width: 350px;">
+        <clr-datagrid>
+            <clr-dg-column></clr-dg-column>
+            <clr-dg-column></clr-dg-column>
+            <clr-dg-row>
+                <clr-dg-cell>
+                    <span>address</span>
+                </clr-dg-cell>
+                <clr-dg-cell>
+                    <app-short-address [address]="address"></app-short-address>
+                </clr-dg-cell>
+            </clr-dg-row>
+            <clr-dg-row>
+                <clr-dg-cell>
+                    <span>name</span>
+                </clr-dg-cell>
+                <clr-dg-cell>
+                    <span>{{name}}</span>
+                </clr-dg-cell>
+            </clr-dg-row>
+            <clr-dg-row>
+                <clr-dg-cell>
+                    <span>symbol</span>
+                </clr-dg-cell>
+                <clr-dg-cell>
+                    <span>{{symbol}}</span>
+                </clr-dg-cell>
+            </clr-dg-row>
+            <clr-dg-row>
+                <clr-dg-cell>
+                    <span>decimals</span>
+                </clr-dg-cell>
+                <clr-dg-cell>
+                    <span>{{decimals}}</span>
+                </clr-dg-cell>
+            </clr-dg-row>
+            <clr-dg-row>
+                <clr-dg-cell>
+                    <span>totalSupply</span>
+                </clr-dg-cell>
+                <clr-dg-cell>
+                    <span><app-balance [decimals]="decimals" [balance]="totalSupply" [symbol]="symbol"></app-balance></span>
+                </clr-dg-cell>
+            </clr-dg-row>
+            <clr-dg-row>
+                <clr-dg-cell>
+                    <span>My {{name}} Balance:</span>
+                </clr-dg-cell>
+                <clr-dg-cell>
+                    <app-balance [decimals]="decimals" [balance]="myBalance" [symbol]="symbol"></app-balance>
+                </clr-dg-cell>
+            </clr-dg-row>
+        </clr-datagrid>
     </div>
 
-    <table>
+    <!-- <div class="clr-row">
+        <div class="clr-example-col-value" style="width: 150px;">
+            <span>name</span>
+        </div>
+        <div class="clr-example-col-value clr-col">
+            <span>{{name}}</span>
+        </div>
+    </div>
+    <div class="clr-row">
+        <div class="clr-example-col-value" style="width: 150px;">
+            <span>symbol</span>
+        </div>
+        <div class="clr-example-col-value clr-col">
+            <span>{{symbol}}</span>
+        </div>
+    </div>
+    <div class="clr-row">
+        <div class="clr-example-col-value" style="width: 150px;">
+            <span>totalSupply</span>
+        </div>
+        <div class="clr-example-col-value clr-col">
+            <span><app-balance [decimals]="decimals" [balance]="totalSupply" [symbol]="symbol"></app-balance></span>
+        </div>
+    </div> -->
+    <h2>Balances</h2>
+    <div style="width: 350px;">
+        <clr-datagrid>
+            <clr-dg-column>Account</clr-dg-column>
+            <clr-dg-column>Balance</clr-dg-column>
+
+            <clr-dg-row *ngFor="let account of accounts">
+                <clr-dg-cell>
+                    <app-short-address [address]="account.address"></app-short-address>
+                </clr-dg-cell>
+                <clr-dg-cell>
+                    <app-balance [balance]="account.balance" [decimals]="decimals" [symbol]="symbol"></app-balance>
+                </clr-dg-cell>
+            </clr-dg-row>
+
+        </clr-datagrid>
+    </div>
+    <!-- <table>
         <caption>Balances</caption>
         <tr>
             <th>Account</th>
@@ -30,7 +126,7 @@
                 <app-balance [balance]="account.balance" [decimals]="decimals" [symbol]="symbol"></app-balance>
             </td>
         </tr>
-    </table>
+    </table> -->
     <div>
         <button class="btn btn-primary" [disabled]="waiting" (click)="buying = true">Buy</button>
         <button class="btn btn-primary" [disabled]="(myBalance == undefined) || (myBalance.comparedTo(0) <= 0) || waiting" (click)="selling = true">Sell</button>

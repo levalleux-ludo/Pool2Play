@@ -1,11 +1,17 @@
-<div *ngIf="!status.connected && !status.connecting">Not connected</div>
-<div *ngIf="status.connecting">
+<div *ngIf="!status.connected && !status.connecting" style="margin: 6px;">Not connected</div>
+<div *ngIf="status.connecting" style="margin: 6px;">
     Connecting to {{status.network}}
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
 </div>
 <div *ngIf="status.connected && !status.connecting">
-    Connected to {{status.network}}
-
-    <span>Account: <app-short-address [address]="status.account"></app-short-address> </span>
-    <span>Balance: {{balance}} </span>
+    <div fxLayout="row">
+        <img matTooltip="{{status.network}}" src="{{image}}" height="{{height}}">
+        <div fxLayout="column" style="margin: 6px;">
+            <div fxFlex>Blockchain: {{status.network}}</div>
+            <div fxFlex>Your Account:
+                <app-short-address [address]="status.account"></app-short-address>
+            </div>
+            <div fxFlex>Your Native Balance: {{balance}} {{nativeSymbol}}</div>
+        </div>
+    </div>
 </div>
