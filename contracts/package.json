@@ -4,6 +4,7 @@
     "description": "",
     "main": "index.js",
     "scripts": {
+        "postinstall": "node scripts/post_install.js",
         "build": "hardhat compile",
         "test": "hardhat test",
         "test:RPS": "hardhat test test/rockPaperScissors-test.js",
